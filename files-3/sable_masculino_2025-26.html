@@ -166,7 +166,7 @@ tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.02)
   </div>
   <div class="g2">
     <div class="card"><div class="ct">Estado equipo</div>
-      <table><thead><tr><th>ATLETA</th><th>FAT</th><th>FIS</th><th>SUE</th><th>ANI</th><th>ESTADO</th></tr></thead>
+      <table><thead><tr><th>ATLETA</th><th>FAT</th><th>FIS</th><th>SUE</th><th>ANI</th><th id='th-ciclo' style='display:none'>CICLO</th><th>ESTADO</th></tr></thead>
       <tbody id="r-team"><tr><td colspan="6" style="color:var(--mu);font-family:var(--fm);font-size:12px;padding:16px 8px">Cargando datos...</td></tr></tbody></table>
     </div>
     <div>
@@ -269,7 +269,7 @@ tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.02)
         <select id="dp-fase">
           <option value="">— sin fase —</option>
           <option value="A">A — Acumulación</option><option value="A+">A+ — Acum. avanzada</option>
-          <option value="A++">A++ — Acum. máxima</option><option value="I">I — Intensificación</option>
+          <option value="A++">A++ — Acum. máxima</option>
           <option value="T">T — Transformación</option><option value="R">R — Realización</option>
           <option value="C">C — Competición</option><option value="RC">RC — Realiz. + Comp.</option>
         </select>
@@ -336,6 +336,7 @@ tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.02)
   <div class="adbar">
     <span class="adl">DATOS</span>
     <span style="font-family:var(--fm);font-size:11px;color:var(--ok)">✓ Guardado automático</span>
+    <span style="font-family:var(--fm);font-size:10px;color:var(--mu)" id="sync-status">↺ Sincronizando...</span>
     <button class="btn btd" style="margin-left:auto;font-size:11px;padding:5px 11px" onclick="resetAll()">↺ Restaurar default</button>
   </div>
   <div class="ads">
@@ -373,7 +374,7 @@ tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.02)
         <div class="fg"><label>RPE PLANIFICADO</label><input id="wf-rpe" type="number" step="0.1" min="1" max="10" placeholder="ej. 3.5"></div>
       </div>
       <div class="fg2">
-        <div class="fg"><label>FASE *</label><select id="wf-fase"><option value="A">A — Acumulación</option><option value="A+">A+ — Acum. avanzada</option><option value="A++">A++ — Acum. máxima</option><option value="I">I — Intensificación</option><option value="T">T — Transformación</option><option value="R">R — Realización</option><option value="C">C — Competición</option><option value="RC">RC — Realiz. + Comp.</option></select></div>
+        <div class="fg"><label>FASE *</label><select id="wf-fase"><option value="A">A — Acumulación</option><option value="A+">A+ — Acum. avanzada</option><option value="A++">A++ — Acum. máxima</option><option value="T">T — Transformación</option><option value="R">R — Realización</option><option value="C">C — Competición</option><option value="RC">RC — Realiz. + Comp.</option></select></div>
         <div class="fg"><label>NOTAS</label><input id="wf-notas" placeholder="Objetivos, competición..."></div>
       </div>
       <div class="fact"><button class="btn btc" onclick="closeWF()">Cancelar</button><button class="btn bts" onclick="saveWeek()">Guardar semana</button></div>
@@ -390,6 +391,7 @@ tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.02)
 // ═══════════════════════════════════════
 const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vTkbWHXjJzfw2CzOUfPk0vLYl40usTWdHJa-qZbILR1YRh9zpDkawlu2dVLQ_CN1F-2Zgchgx1I6juE/pub?output=csv';
 const STORE_KEY='sable26masc';
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxatq5KfalFg_Rb1r7cev_5h8L5qx5hUSFdG3UbxKJ-NYQpCHIglZCjxyR5r-NityFY/exec';
 
 // ═══════════════════════════════════════
 // COLORS
@@ -444,20 +446,20 @@ const DCMPS=[
   {id:41,name:'Cto España ABS',mes:'Jun 2026',sem:40,dia:null,dia_fin:null,tipo:'Campeonato',cat:'Nacional',imp:'alta',lugar:'',notas:''},
 ];
 const DWKS=[
-  {id:1,num:1,mes:'Sep 2025',fase:'A',rpe:2.4,notas:'Inicio temporada'},{id:2,num:2,mes:'Sep 2025',fase:'A+',rpe:5.0,notas:''},{id:3,num:3,mes:'Sep 2025',fase:'A++',rpe:null,notas:''},{id:4,num:4,mes:'Sep 2025',fase:'C',rpe:3.2,notas:''},{id:5,num:5,mes:'Sep 2025',fase:'I',rpe:3.0,notas:''},
+  {id:1,num:1,mes:'Sep 2025',fase:'A',rpe:2.4,notas:'Inicio temporada'},{id:2,num:2,mes:'Sep 2025',fase:'A+',rpe:5.0,notas:''},{id:3,num:3,mes:'Sep 2025',fase:'A++',rpe:null,notas:''},{id:4,num:4,mes:'Sep 2025',fase:'C',rpe:3.2,notas:''},{id:5,num:5,mes:'Sep 2025',fase:'T',rpe:3.0,notas:''},
   {id:6,num:6,mes:'Oct 2025',fase:'R',rpe:3.2,notas:''},{id:7,num:7,mes:'Oct 2025',fase:'C',rpe:null,notas:''},{id:8,num:8,mes:'Oct 2025',fase:'RC',rpe:null,notas:''},{id:9,num:9,mes:'Oct 2025',fase:'A',rpe:null,notas:''},
-  {id:10,num:10,mes:'Nov 2025',fase:'C',rpe:null,notas:''},{id:11,num:11,mes:'Nov 2025',fase:'A',rpe:3.0,notas:''},{id:12,num:12,mes:'Nov 2025',fase:'A+',rpe:4.0,notas:''},{id:13,num:13,mes:'Nov 2025',fase:'I',rpe:3.5,notas:''},
+  {id:10,num:10,mes:'Nov 2025',fase:'C',rpe:null,notas:''},{id:11,num:11,mes:'Nov 2025',fase:'A',rpe:3.0,notas:''},{id:12,num:12,mes:'Nov 2025',fase:'A+',rpe:4.0,notas:''},{id:13,num:13,mes:'Nov 2025',fase:'T',rpe:3.5,notas:''},
   {id:14,num:14,mes:'Dic 2025',fase:'RC',rpe:null,notas:''},{id:15,num:15,mes:'Dic 2025',fase:'A',rpe:3.0,notas:''},{id:16,num:16,mes:'Dic 2025',fase:'C',rpe:null,notas:''},{id:17,num:17,mes:'Dic 2025',fase:'A',rpe:null,notas:''},{id:18,num:18,mes:'Dic 2025',fase:'T',rpe:2.0,notas:'Transición Navidad'},
-  {id:19,num:19,mes:'Ene 2026',fase:'RC',rpe:null,notas:''},{id:20,num:20,mes:'Ene 2026',fase:'A',rpe:3.0,notas:''},{id:21,num:21,mes:'Ene 2026',fase:'I',rpe:3.5,notas:''},{id:22,num:22,mes:'Ene 2026',fase:'R',rpe:2.5,notas:''},
-  {id:23,num:23,mes:'Feb 2026',fase:'C',rpe:null,notas:''},{id:24,num:24,mes:'Feb 2026',fase:'A',rpe:3.5,notas:''},{id:25,num:25,mes:'Feb 2026',fase:'A+',rpe:4.0,notas:''},{id:26,num:26,mes:'Feb 2026',fase:'I',rpe:3.5,notas:''},
+  {id:19,num:19,mes:'Ene 2026',fase:'RC',rpe:null,notas:''},{id:20,num:20,mes:'Ene 2026',fase:'A',rpe:3.0,notas:''},{id:21,num:21,mes:'Ene 2026',fase:'T',rpe:3.5,notas:''},{id:22,num:22,mes:'Ene 2026',fase:'R',rpe:2.5,notas:''},
+  {id:23,num:23,mes:'Feb 2026',fase:'C',rpe:null,notas:''},{id:24,num:24,mes:'Feb 2026',fase:'A',rpe:3.5,notas:''},{id:25,num:25,mes:'Feb 2026',fase:'A+',rpe:4.0,notas:''},{id:26,num:26,mes:'Feb 2026',fase:'T',rpe:3.5,notas:''},
   {id:27,num:27,mes:'Mar 2026',fase:'RC',rpe:null,notas:''},{id:28,num:28,mes:'Mar 2026',fase:'A',rpe:3.0,notas:''},{id:29,num:29,mes:'Mar 2026',fase:'RC',rpe:null,notas:''},{id:30,num:30,mes:'Mar 2026',fase:'A',rpe:3.5,notas:''},{id:31,num:31,mes:'Mar 2026',fase:'A+',rpe:4.0,notas:''},
-  {id:32,num:32,mes:'Abr 2026',fase:'A++',rpe:4.5,notas:''},{id:33,num:33,mes:'Abr 2026',fase:'I',rpe:3.5,notas:''},{id:34,num:34,mes:'Abr 2026',fase:'R',rpe:3.0,notas:''},{id:35,num:35,mes:'Abr 2026',fase:'C',rpe:null,notas:''},
+  {id:32,num:32,mes:'Abr 2026',fase:'A++',rpe:4.5,notas:''},{id:33,num:33,mes:'Abr 2026',fase:'T',rpe:3.5,notas:''},{id:34,num:34,mes:'Abr 2026',fase:'R',rpe:3.0,notas:''},{id:35,num:35,mes:'Abr 2026',fase:'C',rpe:null,notas:''},
   {id:36,num:36,mes:'May 2026',fase:'RC',rpe:null,notas:''},{id:37,num:37,mes:'May 2026',fase:'A',rpe:3.5,notas:''},{id:38,num:38,mes:'May 2026',fase:'RC',rpe:null,notas:''},{id:39,num:39,mes:'May 2026',fase:'A',rpe:3.0,notas:''},
-  {id:40,num:40,mes:'Jun 2026',fase:'C',rpe:null,notas:''},{id:41,num:41,mes:'Jun 2026',fase:'I',rpe:3.5,notas:''},{id:42,num:42,mes:'Jun 2026',fase:'RC',rpe:null,notas:''},{id:43,num:43,mes:'Jun 2026',fase:'A',rpe:2.5,notas:''},
-  {id:44,num:44,mes:'Jul 2026',fase:'A+',rpe:3.5,notas:''},{id:45,num:45,mes:'Jul 2026',fase:'I',rpe:3.0,notas:''},{id:46,num:46,mes:'Jul 2026',fase:'RC',rpe:null,notas:''},{id:47,num:47,mes:'Jul 2026',fase:'T',rpe:2.0,notas:''},
-  {id:48,num:48,mes:'Ago 2026',fase:'A',rpe:2.5,notas:''},{id:49,num:49,mes:'Ago 2026',fase:'A+',rpe:3.5,notas:''},{id:50,num:50,mes:'Ago 2026',fase:'I',rpe:3.0,notas:''},{id:51,num:51,mes:'Ago 2026',fase:'RC',rpe:null,notas:''},{id:52,num:52,mes:'Ago 2026',fase:'T',rpe:1.5,notas:'Fin temporada'},
+  {id:40,num:40,mes:'Jun 2026',fase:'C',rpe:null,notas:''},{id:41,num:41,mes:'Jun 2026',fase:'T',rpe:3.5,notas:''},{id:42,num:42,mes:'Jun 2026',fase:'RC',rpe:null,notas:''},{id:43,num:43,mes:'Jun 2026',fase:'A',rpe:2.5,notas:''},
+  {id:44,num:44,mes:'Jul 2026',fase:'A+',rpe:3.5,notas:''},{id:45,num:45,mes:'Jul 2026',fase:'T',rpe:3.0,notas:''},{id:46,num:46,mes:'Jul 2026',fase:'RC',rpe:null,notas:''},{id:47,num:47,mes:'Jul 2026',fase:'T',rpe:2.0,notas:''},
+  {id:48,num:48,mes:'Ago 2026',fase:'A',rpe:2.5,notas:''},{id:49,num:49,mes:'Ago 2026',fase:'A+',rpe:3.5,notas:''},{id:50,num:50,mes:'Ago 2026',fase:'T',rpe:3.0,notas:''},{id:51,num:51,mes:'Ago 2026',fase:'RC',rpe:null,notas:''},{id:52,num:52,mes:'Ago 2026',fase:'T',rpe:1.5,notas:'Fin temporada'},
 ];
-const RPE_P=[{ws:'22/09',rpe:2.4},{ws:'29/09',rpe:5.0},{ws:'06/10',rpe:null},{ws:'13/10',rpe:null},{ws:'20/10',rpe:3.2},{ws:'27/10',rpe:3.2},{ws:'03/11',rpe:3.0},{ws:'10/11',rpe:3.2}];
+const RPE_P=[{ws:'22/09',rpe:3.2},{ws:'29/09',rpe:3.7},{ws:'06/10',rpe:4.2},{ws:'13/10',rpe:5.0},{ws:'20/10',rpe:2.5},{ws:'27/10',rpe:2.0},{ws:'03/11',rpe:5.0},{ws:'10/11',rpe:5.0},{ws:'17/11',rpe:3.2},{ws:'24/11',rpe:5.0},{ws:'01/12',rpe:3.2},{ws:'08/12',rpe:3.7},{ws:'15/12',rpe:2.5},{ws:'22/12',rpe:5.0},{ws:'29/12',rpe:3.2},{ws:'05/01',rpe:5.0},{ws:'12/01',rpe:3.2},{ws:'19/01',rpe:2.5},{ws:'26/01',rpe:5.0},{ws:'02/02',rpe:3.2},{ws:'09/02',rpe:2.5},{ws:'16/02',rpe:2.0},{ws:'23/02',rpe:5.0},{ws:'02/03',rpe:3.2},{ws:'09/03',rpe:3.7},{ws:'16/03',rpe:2.5},{ws:'23/03',rpe:5.0},{ws:'30/03',rpe:3.2},{ws:'06/04',rpe:5.0},{ws:'13/04',rpe:3.2},{ws:'20/04',rpe:3.7},{ws:'27/04',rpe:4.2},{ws:'04/05',rpe:2.5},{ws:'11/05',rpe:2.0},{ws:'18/05',rpe:5.0},{ws:'25/05',rpe:5.0},{ws:'01/06',rpe:3.2},{ws:'08/06',rpe:5.0},{ws:'15/06',rpe:3.2},{ws:'22/06',rpe:5.0},{ws:'29/06',rpe:2.5},{ws:'06/07',rpe:5.0},{ws:'13/07',rpe:3.2},{ws:'20/07',rpe:3.7},{ws:'27/07',rpe:2.5},{ws:'03/08',rpe:5.0},{ws:'10/08',rpe:2.5},{ws:'17/08',rpe:3.2},{ws:'24/08',rpe:3.7},{ws:'31/08',rpe:2.5},{ws:'07/09',rpe:5.0},{ws:'14/09',rpe:2.5}];
 const MES_IDX=['Sep 2025','Oct 2025','Nov 2025','Dic 2025','Ene 2026','Feb 2026','Mar 2026','Abr 2026','May 2026','Jun 2026','Jul 2026','Ago 2026','Sep 2026'];
 
 // ═══════════════════════════════════════
@@ -467,10 +469,50 @@ let S={comps:[],weeks:[],nid:200};
 let ATHL=[],WKL=[],allRows=[],dfDays=7;
 
 function loadS(){
-  try{const d=localStorage.getItem(STORE_KEY);if(d){S=JSON.parse(d);if(!S.days)S.days={};return;}}catch(e){}
-  S={comps:JSON.parse(JSON.stringify(DCMPS)),weeks:JSON.parse(JSON.stringify(DWKS)),nid:200,days:{}};
+  // Try localStorage first (instant)
+  try{const d=localStorage.getItem(STORE_KEY);if(d){S=JSON.parse(d);if(!S.days)S.days={};}}catch(e){}
+  if(!S.comps){S={comps:JSON.parse(JSON.stringify(DCMPS)),weeks:JSON.parse(JSON.stringify(DWKS)),nid:200,days:{}};}
+  // Then sync from Sheet in background
+  syncFromSheet();
 }
-function saveS(){try{localStorage.setItem(STORE_KEY,JSON.stringify(S));}catch(e){}}
+async function syncFromSheet(){
+  try{
+    const r=await fetch(SCRIPT_URL+'?action=load&team='+STORE_KEY,{signal:AbortSignal.timeout(10000)});
+    const j=await r.json();
+    if(j.data){
+      S=j.data;if(!S.days)S.days={};
+      // Update localStorage with Sheet data
+      localStorage.setItem(STORE_KEY,JSON.stringify(S));
+      // Rebuild UI
+      bNext();
+      if(built['cal'])bCal();
+      if(built['tmp']){bTL();bTCtbl();}
+      if(built['adm']){rAC();rAW();}
+      console.log('Datos sincronizados desde Sheet');
+      const ss=document.getElementById('sync-status');if(ss)ss.textContent='✓ Sincronizado con Sheet';
+    }
+  }catch(e){
+    console.log('Sin conexión al Sheet, usando datos locales');
+    const ss=document.getElementById('sync-status');if(ss){ss.textContent='⚠ Sin conexión al Sheet';ss.style.color='var(--wn)';}
+  }
+}
+function saveS(){
+  try{localStorage.setItem(STORE_KEY,JSON.stringify(S));}catch(e){}
+  // Save to Sheet in background
+  saveToSheet();
+}
+async function saveToSheet(){
+  try{
+    await fetch(SCRIPT_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'save',team:STORE_KEY,data:S}),
+      signal:AbortSignal.timeout(10000)
+    });
+  }catch(e){
+    console.log('No se pudo guardar en Sheet:', e.message);
+  }
+}
 function resetAll(){if(!confirm('¿Restaurar datos originales?'))return;localStorage.removeItem(STORE_KEY);location.reload();}
 loadS();
 
@@ -545,21 +587,23 @@ function setDF(days,btn){
 
 function processRows(rows){
   // Find header row and map columns
-  let hdr=-1,iTs=0,iEmail=1,iFat=3,iFis=4,iAni=5,iSue=6,iLes=7;
+  let hdr=-1,iTs=0,iEmail=1,iFat=3,iFis=4,iAni=5,iSue=6,iLes=7,iCiclo=-1;
   for(let i=0;i<Math.min(5,rows.length);i++){
     const joined=rows[i].join('').toLowerCase();
     if(joined.includes('marca')||joined.includes('correo')){
       hdr=i;
       rows[i].forEach((h,idx)=>{
-        const hl=h.toLowerCase();
-        if(hl.includes('marca'))iTs=idx;
-        else if(hl.includes('correo'))iEmail=idx;
+        const hl=h.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+        if(hl.includes('marca')||hl.includes('timestamp'))iTs=idx;
+        else if(hl.includes('correo')||hl.includes('email'))iEmail=idx;
         else if(hl.includes('fatiga'))iFat=idx;
-        else if(hl.includes('físic')||hl.includes('fisic'))iFis=idx;
-        else if(hl.includes('ánim')||hl.includes('anim'))iAni=idx;
-        else if(hl.includes('dormi')||hl.includes('sueño')||hl.includes('sueno'))iSue=idx;
+        else if(hl.includes('fisic')||hl.includes('fisico')||hl.includes('encuentras'))iFis=idx;
+        else if(hl.includes('anim')||hl.includes('estado de an'))iAni=idx;
+        else if(hl.includes('dormi')||hl.includes('sueno')||hl.includes('suen'))iSue=idx;
+        else if(hl.includes('fase')||hl.includes('ciclo')||hl.includes('menstr'))iCiclo=idx;
         else if(hl.includes('dolor')||hl.includes('lesion'))iLes=idx;
       });
+      console.log('Cols detectadas: ts='+iTs+' email='+iEmail+' fat='+iFat+' fis='+iFis+' ani='+iAni+' sue='+iSue+' les='+iLes);
       break;
     }
   }
@@ -589,12 +633,14 @@ function processRows(rows){
     const sue=parseFloat(row[iSue])||null;
     const les=(row[iLes]||'').trim();
     const hasL=les&&les.length>1&&!['no','nan','ninguno','ninguna'].includes(les.toLowerCase());
-    if(!byEmail[email])byEmail[email]={fat:[],fis:[],ani:[],sue:[],les:[],n:0};
+    if(!byEmail[email])byEmail[email]={fat:[],fis:[],ani:[],sue:[],les:[],ciclo:[],n:0};
     if(fat!==null)byEmail[email].fat.push(fat);
     if(fis!==null)byEmail[email].fis.push(fis);
     if(ani!==null)byEmail[email].ani.push(ani);
     if(sue!==null)byEmail[email].sue.push(sue);
     if(hasL)byEmail[email].les.push(les);
+    const cicloVal=iCiclo>=0?(row[iCiclo]||'').trim():'';
+    if(cicloVal&&cicloVal.length>0)byEmail[email].ciclo.push(cicloVal);
     byEmail[email].n++;
     const mon=getMonday(row[iTs]);
     if(mon){
@@ -611,7 +657,9 @@ function processRows(rows){
     if(parts.length>=2)name=parts[0].charAt(0).toUpperCase()+parts[0].slice(1)+' '+parts[1].charAt(0).toUpperCase()+'.';
     else if(parts.length===1)name=parts[0].charAt(0).toUpperCase()+parts[0].slice(1);
     else name=email.split('@')[0];
-    return{name:name.slice(0,16),fat:avg(d.fat),fis:avg(d.fis),ani:avg(d.ani),sue:avg(d.sue),n:d.n,ln:d.les.length,les:[...new Set(d.les)].slice(0,3),ac:ACL[idx%ACL.length],ab:ABG[idx%ABG.length]};
+    // Get most recent ciclo phase
+    const cicloRecent=d.ciclo.length?d.ciclo[d.ciclo.length-1]:'';
+    return{name:name.slice(0,16),fat:avg(d.fat),fis:avg(d.fis),ani:avg(d.ani),sue:avg(d.sue),n:d.n,ln:d.les.length,les:[...new Set(d.les)].slice(0,3),ciclo:cicloRecent,ac:ACL[idx%ACL.length],ab:ABG[idx%ABG.length]};
   }).filter(a=>a.n>0);
 
   WKL=Object.entries(byWeek).sort((a,b)=>a[0].localeCompare(b[0])).map(([mon,d])=>{
@@ -646,12 +694,16 @@ function processRows(rows){
 // RESUMEN
 // ═══════════════════════════════════════
 function bTeam(){
+  const hasCiclo=ATHL.some(a=>a.ciclo&&a.ciclo.length>0);
+  const thC=document.getElementById('th-ciclo');
+  if(thC)thC.style.display=hasCiclo?'':'none';
   document.getElementById('r-team').innerHTML=ATHL.length?ATHL.map(a=>`<tr>
     <td><span style="display:flex;align-items:center;gap:7px"><span style="width:24px;height:24px;border-radius:50%;background:${a.ab};display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:8px;font-weight:700;color:${a.ac}">${INI(a.name)}</span>${a.name}</span></td>
     <td style="color:${clr(a.fat,true)};font-family:var(--fm)">${R1(a.fat)}</td>
     <td style="color:${clr(a.fis)};font-family:var(--fm)">${R1(a.fis)}</td>
     <td style="color:${clr(a.sue)};font-family:var(--fm)">${R1(a.sue)}</td>
     <td style="color:${clr(a.ani)};font-family:var(--fm)">${R1(a.ani)}</td>
+    <td style='display:${hasCiclo?"":"none"}'>${a.ciclo?`<span class="b" style="background:rgba(200,80,240,.15);color:#d060f0;font-size:9px">${a.ciclo}</span>`:''}</td>
     <td>${a.ln>0?`<span class="b b-dg">lesión</span>`:`<span class="b b-ok">OK</span>`}</td>
   </tr>`).join(''):'<tr><td colspan="6" style="color:var(--mu);font-family:var(--fm);font-size:12px;padding:10px 8px">Sin datos en el periodo seleccionado</td></tr>';
 }
@@ -730,7 +782,8 @@ function fAtl(f,btn){
       ${[['FAT',R1(a.fat),clr(a.fat,true)],['FIS',R1(a.fis),clr(a.fis)],['ANI',R1(a.ani),clr(a.ani)],['SUE',R1(a.sue),clr(a.sue)]].map(([l,v,c])=>`
       <div class="msc"><div class="msl">${l}</div><div class="msv" style="color:${c}">${v}</div></div>`).join('')}
     </div>
-    ${a.les.length?`<div style="margin-top:8px">${a.les.map(l=>`<span class="itag">${l}</span>`).join('')}</div>`:''}
+    ${a.ciclo?`<div style="margin-top:6px"><span style="background:rgba(200,80,240,.12);border:1px solid rgba(200,80,240,.3);color:#d060f0;font-size:10px;padding:2px 7px;border-radius:3px;font-family:var(--fm)">🌙 ${a.ciclo}</span></div>`:''}
+    ${a.les.length?`<div style="margin-top:6px">${a.les.map(l=>`<span class="itag">${l}</span>`).join('')}</div>`:''}
   </div>`).join('')||'<div style="color:var(--mu);font-size:13px">Sin datos en el periodo seleccionado</div>';
   document.getElementById('atl-det').style.display='none';
   bAtlChart(data);
@@ -842,7 +895,7 @@ function bCal(){
         h+=`<div class="cd ${pc}${hc?' hc':''}${hconc?' hconc':''}" onclick="openDayPanel(this)" data-key="${dkey}" data-wn="${wl.n}" data-mes="${m.mes}" style="cursor:pointer">
           <div class="dn">${d}</div>
           <div class="dph" style="color:${PC[showFase]||'var(--mu)'}">${showFase}</div>
-          ${showRpe?`<div style="font-family:var(--fm);font-size:9px;color:var(--mu)">RPE ${showRpe}</div>`:''}
+          ${wd.rpe?`<div style="font-family:var(--fm);font-size:9px;color:rgba(200,240,80,.6)">RPE ${wd.rpe}</div>`:''}
           ${ddata.nota?`<div style="font-size:8px;margin-top:2px;color:var(--bl);line-height:1.2;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${ddata.nota}</div>`:''}
           ${dayCs.length?`<div class="dcmp">${dayCs.map(c=>c.name).join(', ')}</div>`:''}
           ${dayCn.length?`<div class="dnac">${dayCn[0].name.slice(0,14)}</div>`:''}

@@ -166,7 +166,7 @@ tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.02)
   </div>
   <div class="g2">
     <div class="card"><div class="ct">Estado equipo</div>
-      <table><thead><tr><th>ATLETA</th><th>FAT</th><th>FIS</th><th>SUE</th><th>ANI</th><th>ESTADO</th></tr></thead>
+      <table><thead><tr><th>ATLETA</th><th>FAT</th><th>FIS</th><th>SUE</th><th>ANI</th><th id='th-ciclo' style='display:none'>CICLO</th><th>ESTADO</th></tr></thead>
       <tbody id="r-team"><tr><td colspan="6" style="color:var(--mu);font-family:var(--fm);font-size:12px;padding:16px 8px">Cargando datos...</td></tr></tbody></table>
     </div>
     <div>
@@ -587,21 +587,23 @@ function setDF(days,btn){
 
 function processRows(rows){
   // Find header row and map columns
-  let hdr=-1,iTs=0,iEmail=1,iFat=3,iFis=4,iAni=5,iSue=6,iLes=7;
+  let hdr=-1,iTs=0,iEmail=1,iFat=3,iFis=4,iAni=5,iSue=6,iLes=7,iCiclo=-1;
   for(let i=0;i<Math.min(5,rows.length);i++){
     const joined=rows[i].join('').toLowerCase();
     if(joined.includes('marca')||joined.includes('correo')){
       hdr=i;
       rows[i].forEach((h,idx)=>{
-        const hl=h.toLowerCase();
-        if(hl.includes('marca'))iTs=idx;
-        else if(hl.includes('correo'))iEmail=idx;
+        const hl=h.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+        if(hl.includes('marca')||hl.includes('timestamp'))iTs=idx;
+        else if(hl.includes('correo')||hl.includes('email'))iEmail=idx;
         else if(hl.includes('fatiga'))iFat=idx;
-        else if(hl.includes('físic')||hl.includes('fisic'))iFis=idx;
-        else if(hl.includes('ánim')||hl.includes('anim'))iAni=idx;
-        else if(hl.includes('dormi')||hl.includes('sueño')||hl.includes('sueno'))iSue=idx;
+        else if(hl.includes('fisic')||hl.includes('fisico')||hl.includes('encuentras'))iFis=idx;
+        else if(hl.includes('anim')||hl.includes('estado de an'))iAni=idx;
+        else if(hl.includes('dormi')||hl.includes('sueno')||hl.includes('suen'))iSue=idx;
+        else if(hl.includes('fase')||hl.includes('ciclo')||hl.includes('menstr'))iCiclo=idx;
         else if(hl.includes('dolor')||hl.includes('lesion'))iLes=idx;
       });
+      console.log('Cols detectadas: ts='+iTs+' email='+iEmail+' fat='+iFat+' fis='+iFis+' ani='+iAni+' sue='+iSue+' les='+iLes);
       break;
     }
   }
@@ -631,12 +633,14 @@ function processRows(rows){
     const sue=parseFloat(row[iSue])||null;
     const les=(row[iLes]||'').trim();
     const hasL=les&&les.length>1&&!['no','nan','ninguno','ninguna'].includes(les.toLowerCase());
-    if(!byEmail[email])byEmail[email]={fat:[],fis:[],ani:[],sue:[],les:[],n:0};
+    if(!byEmail[email])byEmail[email]={fat:[],fis:[],ani:[],sue:[],les:[],ciclo:[],n:0};
     if(fat!==null)byEmail[email].fat.push(fat);
     if(fis!==null)byEmail[email].fis.push(fis);
     if(ani!==null)byEmail[email].ani.push(ani);
     if(sue!==null)byEmail[email].sue.push(sue);
     if(hasL)byEmail[email].les.push(les);
+    const cicloVal=iCiclo>=0?(row[iCiclo]||'').trim():'';
+    if(cicloVal&&cicloVal.length>0)byEmail[email].ciclo.push(cicloVal);
     byEmail[email].n++;
     const mon=getMonday(row[iTs]);
     if(mon){
@@ -653,7 +657,9 @@ function processRows(rows){
     if(parts.length>=2)name=parts[0].charAt(0).toUpperCase()+parts[0].slice(1)+' '+parts[1].charAt(0).toUpperCase()+'.';
     else if(parts.length===1)name=parts[0].charAt(0).toUpperCase()+parts[0].slice(1);
     else name=email.split('@')[0];
-    return{name:name.slice(0,16),fat:avg(d.fat),fis:avg(d.fis),ani:avg(d.ani),sue:avg(d.sue),n:d.n,ln:d.les.length,les:[...new Set(d.les)].slice(0,3),ac:ACL[idx%ACL.length],ab:ABG[idx%ABG.length]};
+    // Get most recent ciclo phase
+    const cicloRecent=d.ciclo.length?d.ciclo[d.ciclo.length-1]:'';
+    return{name:name.slice(0,16),fat:avg(d.fat),fis:avg(d.fis),ani:avg(d.ani),sue:avg(d.sue),n:d.n,ln:d.les.length,les:[...new Set(d.les)].slice(0,3),ciclo:cicloRecent,ac:ACL[idx%ACL.length],ab:ABG[idx%ABG.length]};
   }).filter(a=>a.n>0);
 
   WKL=Object.entries(byWeek).sort((a,b)=>a[0].localeCompare(b[0])).map(([mon,d])=>{
@@ -688,12 +694,16 @@ function processRows(rows){
 // RESUMEN
 // ═══════════════════════════════════════
 function bTeam(){
+  const hasCiclo=ATHL.some(a=>a.ciclo&&a.ciclo.length>0);
+  const thC=document.getElementById('th-ciclo');
+  if(thC)thC.style.display=hasCiclo?'':'none';
   document.getElementById('r-team').innerHTML=ATHL.length?ATHL.map(a=>`<tr>
     <td><span style="display:flex;align-items:center;gap:7px"><span style="width:24px;height:24px;border-radius:50%;background:${a.ab};display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:8px;font-weight:700;color:${a.ac}">${INI(a.name)}</span>${a.name}</span></td>
     <td style="color:${clr(a.fat,true)};font-family:var(--fm)">${R1(a.fat)}</td>
     <td style="color:${clr(a.fis)};font-family:var(--fm)">${R1(a.fis)}</td>
     <td style="color:${clr(a.sue)};font-family:var(--fm)">${R1(a.sue)}</td>
     <td style="color:${clr(a.ani)};font-family:var(--fm)">${R1(a.ani)}</td>
+    <td style='display:${hasCiclo?"":"none"}'>${a.ciclo?`<span class="b" style="background:rgba(200,80,240,.15);color:#d060f0;font-size:9px">${a.ciclo}</span>`:''}</td>
     <td>${a.ln>0?`<span class="b b-dg">lesión</span>`:`<span class="b b-ok">OK</span>`}</td>
   </tr>`).join(''):'<tr><td colspan="6" style="color:var(--mu);font-family:var(--fm);font-size:12px;padding:10px 8px">Sin datos en el periodo seleccionado</td></tr>';
 }
@@ -772,7 +782,8 @@ function fAtl(f,btn){
       ${[['FAT',R1(a.fat),clr(a.fat,true)],['FIS',R1(a.fis),clr(a.fis)],['ANI',R1(a.ani),clr(a.ani)],['SUE',R1(a.sue),clr(a.sue)]].map(([l,v,c])=>`
       <div class="msc"><div class="msl">${l}</div><div class="msv" style="color:${c}">${v}</div></div>`).join('')}
     </div>
-    ${a.les.length?`<div style="margin-top:8px">${a.les.map(l=>`<span class="itag">${l}</span>`).join('')}</div>`:''}
+    ${a.ciclo?`<div style="margin-top:6px"><span style="background:rgba(200,80,240,.12);border:1px solid rgba(200,80,240,.3);color:#d060f0;font-size:10px;padding:2px 7px;border-radius:3px;font-family:var(--fm)">🌙 ${a.ciclo}</span></div>`:''}
+    ${a.les.length?`<div style="margin-top:6px">${a.les.map(l=>`<span class="itag">${l}</span>`).join('')}</div>`:''}
   </div>`).join('')||'<div style="color:var(--mu);font-size:13px">Sin datos en el periodo seleccionado</div>';
   document.getElementById('atl-det').style.display='none';
   bAtlChart(data);
