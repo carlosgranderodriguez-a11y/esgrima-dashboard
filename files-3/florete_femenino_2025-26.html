@@ -627,10 +627,11 @@ function processRows(rows){
     if(!email||!email.includes('@'))continue;
     const rd=parseDate(row[iTs]);
     if(!rd||isNaN(rd)||rd<cutoff)continue;
-    const fat=parseFloat(row[iFat])||null;
-    const fis=parseFloat(row[iFis])||null;
-    const ani=parseFloat(row[iAni])||null;
-    const sue=parseFloat(row[iSue])||null;
+    const pf=v=>{if(!v&&v!==0)return null;const n=parseFloat(String(v).replace(',','.'));return isNaN(n)?null:n;};
+    const fat=pf(row[iFat]);
+    const fis=pf(row[iFis]);
+    const ani=pf(row[iAni]);
+    const sue=pf(row[iSue]);
     const les=(row[iLes]||'').trim();
     const hasL=les&&les.length>1&&!['no','nan','ninguno','ninguna'].includes(les.toLowerCase());
     if(!byEmail[email])byEmail[email]={fat:[],fis:[],ani:[],sue:[],les:[],ciclo:[],n:0};
