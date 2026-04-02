@@ -471,7 +471,11 @@ let ATHL=[],WKL=[],allRows=[],dfDays=7,hasCicloData=false;
 function loadS(){
   // Try localStorage first (instant)
   try{const d=localStorage.getItem(STORE_KEY);if(d){S=JSON.parse(d);if(!S.days)S.days={};}}catch(e){}
-  if(!S.comps){S={comps:JSON.parse(JSON.stringify(DCMPS)),weeks:JSON.parse(JSON.stringify(DWKS)),nid:200,days:{}};}
+  // Always use defaults if comps is empty or missing
+  if(!S.comps||S.comps.length===0){
+    S={comps:JSON.parse(JSON.stringify(DCMPS)),weeks:JSON.parse(JSON.stringify(DWKS)),nid:200,days:{}};
+    console.log('Usando datos por defecto: '+S.comps.length+' competiciones');
+  }
   // Then sync from Sheet in background
   syncFromSheet();
 }
@@ -479,7 +483,7 @@ async function syncFromSheet(){
   try{
     const r=await fetch(SCRIPT_URL+'?action=load&team='+STORE_KEY,{signal:AbortSignal.timeout(10000)});
     const j=await r.json();
-    if(j.data){
+    if(j.data&&j.data.comps&&j.data.comps.length>0){
       S=j.data;if(!S.days)S.days={};
       // Update localStorage with Sheet data
       localStorage.setItem(STORE_KEY,JSON.stringify(S));
@@ -488,7 +492,7 @@ async function syncFromSheet(){
       if(built['cal'])bCal();
       if(built['tmp']){bTL();bTCtbl();}
       if(built['adm']){rAC();rAW();}
-      console.log('Datos sincronizados desde Sheet');
+      console.log('Datos sincronizados desde Sheet: '+S.comps.length+' competiciones');
       const ss=document.getElementById('sync-status');if(ss)ss.textContent='✓ Sincronizado con Sheet';
     }
   }catch(e){
