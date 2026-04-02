@@ -953,22 +953,16 @@ function bCal(){
     h+=`</div>`;
   });
   document.getElementById('cal-body').innerHTML=h;
-  // Scroll to current month
+  // Scroll to current month using id
   setTimeout(()=>{
     const now=new Date();
     const mesMap={9:'Sep',10:'Oct',11:'Nov',12:'Dic',1:'Ene',2:'Feb',3:'Mar',4:'Abr',5:'May',6:'Jun',7:'Jul',8:'Ago'};
     const yr=now.getFullYear();
     const mon=now.getMonth()+1;
-    const mesLabel=(mesMap[mon]||'')+(yr===2025?' 2025':' 2026');
-    // Find the month heading and scroll to it
-    const headings=document.querySelectorAll('#cal-body div');
-    for(const el of headings){
-      if(el.textContent.trim()===mesLabel&&el.style.fontFamily&&el.style.fontFamily.includes('Syne')){
-        el.scrollIntoView({behavior:'smooth',block:'start'});
-        break;
-      }
-    }
-  },100);
+    const mesLabel=(mesMap[mon]||'')+(yr===2025?'-2025':'-2026');
+    const el=document.getElementById('cal-mes-'+mesLabel);
+    if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+  },150);
 }
 
 // ═══════════════════════════════════════
