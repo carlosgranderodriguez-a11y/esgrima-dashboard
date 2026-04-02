@@ -466,7 +466,7 @@ const MES_IDX=['Sep 2025','Oct 2025','Nov 2025','Dic 2025','Ene 2026','Feb 2026'
 // STATE
 // ═══════════════════════════════════════
 let S={comps:[],weeks:[],nid:200};
-let ATHL=[],WKL=[],allRows=[],dfDays=7;
+let ATHL=[],WKL=[],allRows=[],dfDays=7,hasCicloData=false;
 
 function loadS(){
   // Try localStorage first (instant)
@@ -530,11 +530,20 @@ const avg=arr=>arr.length?Math.round(arr.reduce((s,v)=>s+v,0)/arr.length*10)/10:
 
 function parseDate(str){
   if(!str)return null;
-  // DD/MM/YYYY HH:MM:SS
-  const m=str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-  if(m)return new Date(parseInt(m[3]),parseInt(m[2])-1,parseInt(m[1]));
-  const d=new Date(str);
-  return isNaN(d)?null:d;
+  str=str.trim();
+  // D/MM/YYYY or DD/MM/YYYY with optional time
+  const m=str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+  if(m){
+    const dt=new Date(parseInt(m[3]),parseInt(m[2])-1,parseInt(m[1]));
+    return isNaN(dt)?null:dt;
+  }
+  // YYYY-MM-DD
+  const m2=str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m2){
+    const dt=new Date(parseInt(m2[1]),parseInt(m2[2])-1,parseInt(m2[3]));
+    return isNaN(dt)?null:dt;
+  }
+  return null;
 }
 function getMonday(str){
   const dt=parseDate(str);
@@ -603,7 +612,8 @@ function processRows(rows){
         else if(hl.includes('fase')||hl.includes('ciclo')||hl.includes('menstr'))iCiclo=idx;
         else if(hl.includes('dolor')||hl.includes('lesion'))iLes=idx;
       });
-      console.log('Cols detectadas: ts='+iTs+' email='+iEmail+' fat='+iFat+' fis='+iFis+' ani='+iAni+' sue='+iSue+' les='+iLes);
+      console.log('Cols detectadas: ts='+iTs+' email='+iEmail+' fat='+iFat+' fis='+iFis+' ani='+iAni+' sue='+iSue+' ciclo='+iCiclo+' les='+iLes);
+      console.log('Header row:', rows[i]);
       break;
     }
   }
@@ -652,6 +662,7 @@ function processRows(rows){
     }
   }
 
+  hasCicloData=Object.values(byEmail).some(d=>d.ciclo&&d.ciclo.length>0);
   ATHL=Object.entries(byEmail).map(([email,d],idx)=>{
     const parts=email.split('@')[0].replace(/[._\-]/g,' ').trim().split(/\s+/).filter(Boolean);
     let name='';
@@ -695,7 +706,7 @@ function processRows(rows){
 // RESUMEN
 // ═══════════════════════════════════════
 function bTeam(){
-  const hasCiclo=ATHL.some(a=>a.ciclo&&a.ciclo.length>0);
+  const hasCiclo=hasCicloData;
   const thC=document.getElementById('th-ciclo');
   if(thC)thC.style.display=hasCiclo?'':'none';
   document.getElementById('r-team').innerHTML=ATHL.length?ATHL.map(a=>`<tr>
@@ -704,7 +715,7 @@ function bTeam(){
     <td style="color:${clr(a.fis)};font-family:var(--fm)">${R1(a.fis)}</td>
     <td style="color:${clr(a.sue)};font-family:var(--fm)">${R1(a.sue)}</td>
     <td style="color:${clr(a.ani)};font-family:var(--fm)">${R1(a.ani)}</td>
-    <td style='display:${hasCiclo?"":"none"}'>${a.ciclo?`<span class="b" style="background:rgba(200,80,240,.15);color:#d060f0;font-size:9px">${a.ciclo}</span>`:''}</td>
+    <td style='display:${hasCicloData?"":"none"}'>${a.ciclo?`<span class="b" style="background:rgba(200,80,240,.15);color:#d060f0;font-size:9px">${a.ciclo}</span>`:''}</td>
     <td>${a.ln>0?`<span class="b b-dg">lesión</span>`:`<span class="b b-ok">OK</span>`}</td>
   </tr>`).join(''):'<tr><td colspan="6" style="color:var(--mu);font-family:var(--fm);font-size:12px;padding:10px 8px">Sin datos en el periodo seleccionado</td></tr>';
 }
