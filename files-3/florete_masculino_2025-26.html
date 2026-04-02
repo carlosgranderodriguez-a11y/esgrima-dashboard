@@ -737,13 +737,28 @@ function bTeam(){
   </tr>`).join(''):'<tr><td colspan="6" style="color:var(--mu);font-family:var(--fm);font-size:12px;padding:10px 8px">Sin datos en el periodo seleccionado</td></tr>';
 }
 function bNext(){
-  const next=sortC(S.comps).filter(c=>c.cat==='Senior'&&c.imp==='alta').slice(0,4);
-  document.getElementById('r-next').innerHTML=next.map(c=>`
+  const now=new Date();
+  // Filter comps that are in the future based on mes+dia or mes+sem
+  const upcoming=sortC(S.comps).filter(c=>{
+    const mIdx=MES_IDX.indexOf(c.mes);
+    if(mIdx<0)return false;
+    // Build approximate date for this comp
+    const parts=c.mes.split(' ');
+    const mesMap={'Sep':9,'Oct':10,'Nov':11,'Dic':12,'Ene':1,'Feb':2,'Mar':3,'Abr':4,'May':5,'Jun':6,'Jul':7,'Ago':8};
+    const mon=mesMap[parts[0]]||1;
+    const yr=parseInt(parts[1])||2026;
+    const day=c.dia||15;
+    const compDate=new Date(yr,mon-1,day);
+    return compDate>=now;
+  });
+  const next=upcoming.filter(c=>['Senior','Todos'].includes(c.cat)).slice(0,4);
+  document.getElementById('r-next').innerHTML=next.length?next.map(c=>`
   <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bd)">
     <div><div style="font-weight:500;font-size:13px">${c.name}</div>
-    <div style="font-size:10px;color:var(--mu);font-family:var(--fm);margin-top:1px">${c.mes} · Sem ${c.sem}${c.lugar?' · '+c.lugar:''}</div></div>
+    <div style="font-size:10px;color:var(--mu);font-family:var(--fm);margin-top:1px">${c.mes}${c.dia?' día '+c.dia:''} · Sem ${c.sem}${c.lugar?' · '+c.lugar:''}</div></div>
     <span class="b ${TB(c.tipo)}">${c.tipo}</span>
-  </div>`).join('')+`<div style="padding-top:8px;font-size:11px;color:var(--mu);font-family:var(--fm)"><span onclick="T('tmp')" style="color:var(--bl);cursor:pointer">Ver temporada completa →</span></div>`;
+  </div>`).join(''):`<div style="padding:10px 0;color:var(--mu);font-size:13px">Sin competiciones próximas</div>`;
+  document.getElementById('r-next').innerHTML+=`<div style="padding-top:8px;font-size:11px;color:var(--mu);font-family:var(--fm)"><span onclick="T('tmp')" style="color:var(--bl);cursor:pointer">Ver temporada completa →</span></div>`;
 }
 let trendChart=null;
 function bTrend(){
@@ -938,6 +953,22 @@ function bCal(){
     h+=`</div>`;
   });
   document.getElementById('cal-body').innerHTML=h;
+  // Scroll to current month
+  setTimeout(()=>{
+    const now=new Date();
+    const mesMap={9:'Sep',10:'Oct',11:'Nov',12:'Dic',1:'Ene',2:'Feb',3:'Mar',4:'Abr',5:'May',6:'Jun',7:'Jul',8:'Ago'};
+    const yr=now.getFullYear();
+    const mon=now.getMonth()+1;
+    const mesLabel=(mesMap[mon]||'')+(yr===2025?' 2025':' 2026');
+    // Find the month heading and scroll to it
+    const headings=document.querySelectorAll('#cal-body div');
+    for(const el of headings){
+      if(el.textContent.trim()===mesLabel&&el.style.fontFamily&&el.style.fontFamily.includes('Syne')){
+        el.scrollIntoView({behavior:'smooth',block:'start'});
+        break;
+      }
+    }
+  },100);
 }
 
 // ═══════════════════════════════════════
