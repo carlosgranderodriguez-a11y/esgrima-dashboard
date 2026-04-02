@@ -961,8 +961,12 @@ function bCal(){
     const mon=now.getMonth()+1;
     const mesLabel=(mesMap[mon]||'')+(yr===2025?'-2025':'-2026');
     const el=document.getElementById('cal-mes-'+mesLabel);
-    if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
-  },150);
+    console.log('Scroll a:','cal-mes-'+mesLabel,'el:',el);
+    if(el){
+      const top=el.getBoundingClientRect().top+window.pageYOffset-70;
+      window.scrollTo({top,behavior:'smooth'});
+    }
+  },300);
 }
 
 // ═══════════════════════════════════════
