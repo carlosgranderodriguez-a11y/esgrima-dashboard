@@ -601,17 +601,29 @@ function processRows(rows){
     const joined=rows[i].join('').toLowerCase();
     if(joined.includes('marca')||joined.includes('correo')){
       hdr=i;
+      // Collect all candidates, pick minimum index for each column
+      const cands={iTs:[],iEmail:[],iFat:[],iFis:[],iAni:[],iSue:[],iCiclo:[],iLes:[]};
       rows[i].forEach((h,idx)=>{
         const hl=h.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-        if(hl.includes('marca')||hl.includes('timestamp'))iTs=idx;
-        else if(hl.includes('correo')||hl.includes('email'))iEmail=idx;
-        else if(hl.includes('fatiga'))iFat=idx;
-        else if(hl.includes('fisic')||hl.includes('fisico')||hl.includes('encuentras'))iFis=idx;
-        else if(hl.includes('anim')||hl.includes('estado de an'))iAni=idx;
-        else if(hl.includes('dormi')||hl.includes('sueno')||hl.includes('suen'))iSue=idx;
-        else if(hl.includes('fase')||hl.includes('ciclo')||hl.includes('menstr'))iCiclo=idx;
-        else if(hl.includes('dolor')||hl.includes('lesion'))iLes=idx;
+        if(hl.includes('marca')||hl.includes('timestamp'))cands.iTs.push(idx);
+        if(hl.includes('correo')||hl.includes('email'))cands.iEmail.push(idx);
+        if(hl.includes('fatiga'))cands.iFat.push(idx);
+        if(hl.includes('fisic')||hl.includes('encuentras'))cands.iFis.push(idx);
+        if(hl.includes('anim')||hl.includes('estado de an'))cands.iAni.push(idx);
+        if(hl.includes('dormi')||hl.includes('sueno')||hl.includes('dormido'))cands.iSue.push(idx);
+        if(hl.includes('ciclo')||hl.includes('menstr'))cands.iCiclo.push(idx);
+        if(hl.includes('dolor')||hl.includes('lesion'))cands.iLes.push(idx);
       });
+      const mn=arr=>arr.length?Math.min(...arr):-1;
+      iTs=mn(cands.iTs)>=0?mn(cands.iTs):0;
+      iEmail=mn(cands.iEmail)>=0?mn(cands.iEmail):1;
+      iFat=mn(cands.iFat)>=0?mn(cands.iFat):3;
+      iFis=mn(cands.iFis)>=0?mn(cands.iFis):4;
+      iAni=mn(cands.iAni)>=0?mn(cands.iAni):5;
+      iSue=mn(cands.iSue)>=0?mn(cands.iSue):6;
+      iCiclo=mn(cands.iCiclo);
+      iLes=mn(cands.iLes)>=0?mn(cands.iLes):7;
+      console.log('Cols: ts='+iTs+' email='+iEmail+' fat='+iFat+' fis='+iFis+' ani='+iAni+' sue='+iSue+' ciclo='+iCiclo+' les='+iLes);
       console.log('Cols detectadas: ts='+iTs+' email='+iEmail+' fat='+iFat+' fis='+iFis+' ani='+iAni+' sue='+iSue+' ciclo='+iCiclo+' les='+iLes);
       console.log('Header row:', rows[i]);
       break;
