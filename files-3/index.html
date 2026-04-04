@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Esgrima Nacional 2025–2026</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d0f14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Esgrima">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-startup-image" href="icon-512.png">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0d0f14;--bg2:#13161e;--bg3:#1a1e28;--bd:rgba(255,255,255,.07);--tx:#e8eaf0;--mu:#6b7280;--ac:#c8f050;--bl:#50c8f0;--ok:#50f090}
@@ -99,5 +106,12 @@ footer{margin-top:auto;border-top:1px solid var(--bd);padding:14px 28px;display:
   <div class="ft" id="fd"></div>
 </footer>
 <script>document.getElementById('fd').textContent='Actualizado '+new Date().toLocaleDateString('es-ES',{day:'numeric',month:'long',year:'numeric'});</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./sw.js').then(r=>console.log('SW registered')).catch(e=>console.log('SW error:',e));
+  });
+}
+</script>
 </body>
 </html>
