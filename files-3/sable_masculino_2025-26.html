@@ -63,7 +63,7 @@ tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.02)
 .cdh{font-family:var(--fm);font-size:10px;color:var(--mu);text-align:center;padding:3px 0;letter-spacing:.06em}
 .wr{display:grid;grid-template-columns:50px repeat(7,minmax(0,1fr));gap:3px;margin-bottom:3px}
 .wl{font-family:var(--fm);font-size:9px;color:var(--mu);display:flex;align-items:center;justify-content:center}
-.cd{border-radius:4px;padding:6px 5px;min-height:68px;border:1px solid transparent;transition:opacity .15s}.cd:hover{opacity:.85}
+.cd{border-radius:4px;padding:8px 6px;min-height:90px;border:1px solid transparent;transition:opacity .15s}.cd:hover{opacity:.85}
 .cd.emp{background:rgba(255,255,255,.02)}
 .cd.phA{background:rgba(80,240,144,.07);border-color:rgba(80,240,144,.14)}
 .cd.phAp{background:rgba(80,240,144,.11);border-color:rgba(80,240,144,.22)}
@@ -72,11 +72,12 @@ tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.02)
 .cd.phR{background:rgba(240,160,80,.08);border-color:rgba(240,160,80,.18)}
 .cd.phC{background:rgba(240,80,80,.08);border-color:rgba(240,80,80,.2)}
 .cd.phRC{background:rgba(240,80,80,.13);border-color:rgba(240,80,80,.3)}
+.cd.phD{background:rgba(100,100,120,.1);border-color:rgba(150,150,170,.2)}
 .cd.hconc{border-color:rgba(160,80,240,.7)!important;background:rgba(160,80,240,.12)!important}
 .cd.hc{border-color:rgba(200,240,80,.55)!important}
-.dn{font-family:var(--fm);font-size:11px;color:var(--mu);margin-bottom:2px}
+.dn{font-family:var(--fm);font-size:12px;color:var(--mu);margin-bottom:3px}
 .dph{font-family:var(--fm);font-size:10px;font-weight:500}
-.dcmp{font-size:9px;margin-top:2px;line-height:1.3;color:#c8f050}
+.dcmp{font-size:10px;margin-top:3px;line-height:1.4;color:#c8f050}
 .dnac{font-size:9px;margin-top:1px;color:#f0a050}
 /* TIMELINE */
 .tlw{overflow-x:auto;padding-bottom:6px}
@@ -361,7 +362,8 @@ tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.02)
       <div class="iforamt" id="cf-title">NUEVA COMPETICIÓN</div>
       <div class="fg2"><div class="fg"><label>NOMBRE *</label><input id="cf-name" placeholder="Nombre de la competición"></div><div class="fg"><label>LUGAR</label><input id="cf-lugar" placeholder="Ciudad / País"></div></div>
       <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:8px">
-        <div class="fg"><label>MES *</label><select id="cf-mes"><option>Sep 2025</option><option>Oct 2025</option><option>Nov 2025</option><option>Dic 2025</option><option>Ene 2026</option><option>Feb 2026</option><option>Mar 2026</option><option>Abr 2026</option><option>May 2026</option><option>Jun 2026</option><option>Jul 2026</option><option>Ago 2026</option><option>Sep 2026</option></select></div>
+        <div class="fg"><label>MES INICIO *</label><select id="cf-mes"><option>Sep 2025</option><option>Oct 2025</option><option>Nov 2025</option><option>Dic 2025</option><option>Ene 2026</option><option>Feb 2026</option><option>Mar 2026</option><option>Abr 2026</option><option>May 2026</option><option>Jun 2026</option><option>Jul 2026</option><option>Ago 2026</option><option>Sep 2026</option></select></div>
+        <div class="fg"><label>MES FIN</label><select id="cf-mes-fin"><option value="">— mismo mes —</option><option>Sep 2025</option><option>Oct 2025</option><option>Nov 2025</option><option>Dic 2025</option><option>Ene 2026</option><option>Feb 2026</option><option>Mar 2026</option><option>Abr 2026</option><option>May 2026</option><option>Jun 2026</option><option>Jul 2026</option><option>Ago 2026</option><option>Sep 2026</option></select></div>
         <div class="fg"><label>Nº SEMANA</label><input id="cf-sem" type="number" min="1" max="53" placeholder="ej. 10"></div>
         <div class="fg"><label>DÍA INICIO</label><input id="cf-dia" type="number" min="1" max="31" placeholder="ej. 21"></div>
         <div class="fg"><label>DÍA FIN</label><input id="cf-dia-fin" type="number" min="1" max="31" placeholder="ej. 23"></div>
@@ -919,8 +921,8 @@ const CAL=[
   {mes:'Jul 2026',off:3,wks:[{n:43,s:1,e:5},{n:44,s:6,e:12},{n:45,s:13,e:19},{n:46,s:20,e:26},{n:47,s:27,e:31}]},
   {mes:'Ago 2026',off:6,wks:[{n:47,s:1,e:2},{n:48,s:3,e:9},{n:49,s:10,e:16},{n:50,s:17,e:23},{n:51,s:24,e:30},{n:52,s:31,e:31}]},
 ];
-const PH={'A':'phA','A+':'phAp','A++':'phApp','I':'phI','T':'phT','R':'phR','C':'phC','RC':'phRC','':'emp'};
-const PC={'A':'#50f090','A+':'#50f090','A++':'#50f090','I':'#50c8f0','T':'#50c8f0','R':'#f0a050','C':'#f08080','RC':'#f06060','':'var(--mu)'};
+const PH={'A':'phA','A+':'phAp','A++':'phApp','I':'phI','T':'phT','R':'phR','C':'phC','RC':'phRC','D':'phD','':'emp'};
+const PC={'A':'#50f090','A+':'#50f090','A++':'#50f090','I':'#50c8f0','T':'#50c8f0','R':'#f0a050','C':'#f08080','RC':'#f06060','D':'#8888aa','':'var(--mu)'};
 let calFilter='all';
 function setCalFilter(f,btn){
   calFilter=f;
@@ -938,8 +940,17 @@ function bCal(){
     m.wks.forEach(wl=>{
       const wd=S.weeks.find(w=>w.num===wl.n&&w.mes===m.mes)||S.weeks.find(w=>w.num===wl.n)||{fase:'',rpe:null};
       // Match by sem, OR by mes + dia range overlapping this week
-      const inWeek=(c)=>c.dia?(c.dia<=wl.e&&(c.dia_fin||c.dia)>=wl.s):c.sem===wl.n;
-      const allMatch=S.comps.filter(c=>c.mes===m.mes?inWeek(c):c.sem===wl.n);
+      const inWeek=(c)=>{
+        const endMes=c.mes_fin||c.mes;
+        // Comp spans this month if it starts here or ends here
+        if(c.dia){
+          if(c.mes===m.mes&&c.dia<=wl.e&&(c.dia_fin||c.dia)>=wl.s)return true;
+          if(endMes===m.mes&&c.dia_fin&&c.dia_fin>=wl.s)return true;
+          return false;
+        }
+        return c.sem===wl.n;
+      };
+      const allMatch=S.comps.filter(c=>inWeek(c)||(c.mes===m.mes&&c.sem===wl.n));
       // Apply category filter
       const catMatch=(c)=>{
         if(calFilter==='all')return true;
@@ -956,7 +967,14 @@ function bCal(){
       for(let d=wl.s;d<=wl.e;d++){
         const pc=PH[wd.fase]||'emp';
         const mid=wl.s+Math.floor((wl.e-wl.s)/2);
-        const inDay=(c)=>c.dia?d>=c.dia&&d<=(c.dia_fin||c.dia):d===mid;
+        const inDay=(c)=>{
+          if(!c.dia)return d===mid;
+          const endMes=c.mes_fin||c.mes;
+          if(c.mes===m.mes&&endMes===m.mes)return d>=c.dia&&d<=(c.dia_fin||c.dia);
+          if(c.mes===m.mes)return d>=c.dia; // starts this month, ends next
+          if(endMes===m.mes)return d<=(c.dia_fin||31); // ends this month
+          return true; // spans entire month
+        };
         const dayCs=cs.filter(c=>inDay(c));
         const dayCn=cn.filter(c=>inDay(c));
         const dayCC=cc.filter(c=>inDay(c));
@@ -1006,7 +1024,7 @@ function bCal(){
 // TEMPORADA
 // ═══════════════════════════════════════
 const TLM=[{n:'SEP 25',w:5},{n:'OCT',w:5},{n:'NOV',w:5},{n:'DIC',w:5},{n:'ENE 26',w:4},{n:'FEB',w:4},{n:'MAR',w:5},{n:'ABR',w:5},{n:'MAY',w:5},{n:'JUN',w:5},{n:'JUL',w:5},{n:'AGO',w:5}];
-const TW={'A':'twA','A+':'twAp','A++':'twApp','I':'twI','T':'twT','R':'twR','C':'twC','RC':'twRC','':'twE'};
+const TW={'A':'twA','A+':'twAp','A++':'twApp','I':'twI','T':'twT','R':'twR','C':'twC','RC':'twRC','D':'twE','':'twE'};
 function bTL(){
   const pm={};S.weeks.forEach(w=>{pm[w.num]=w.fase||'';});
   const cb={};S.comps.forEach(c=>{if(!cb[c.sem])cb[c.sem]={s:[],n:[]};if(['Senior','Todos'].includes(c.cat))cb[c.sem].s.push(c.name);if(c.cat==='Nacional')cb[c.sem].n.push(c.name);});
@@ -1104,6 +1122,7 @@ function openCF(id=null){
   document.getElementById('cf-sem').value=c.sem||'';
   document.getElementById('cf-dia').value=c.dia||'';
   document.getElementById('cf-dia-fin').value=c.dia_fin||'';
+  document.getElementById('cf-mes-fin').value=c.mes_fin||'';
   document.getElementById('cf-tipo').value=c.tipo||'GP';
   document.getElementById('cf-imp').value=c.imp||'alta';
   document.getElementById('cf-cat').value=c.cat||'Senior';
@@ -1116,7 +1135,7 @@ function closeCF(){document.getElementById('comp-form').classList.remove('open')
 function saveComp(){
   const name=document.getElementById('cf-name').value.trim();
   if(!name){alert('El nombre es obligatorio');return;}
-  const obj={id:eCId||S.nid++,name,lugar:document.getElementById('cf-lugar').value.trim(),mes:document.getElementById('cf-mes').value,sem:parseInt(document.getElementById('cf-sem').value)||0,dia:parseInt(document.getElementById('cf-dia').value)||null,dia_fin:parseInt(document.getElementById('cf-dia-fin').value)||null,tipo:document.getElementById('cf-tipo').value,imp:document.getElementById('cf-imp').value,cat:document.getElementById('cf-cat').value,notas:document.getElementById('cf-notas').value.trim()};
+  const obj={id:eCId||S.nid++,name,lugar:document.getElementById('cf-lugar').value.trim(),mes:document.getElementById('cf-mes').value,sem:parseInt(document.getElementById('cf-sem').value)||0,dia:parseInt(document.getElementById('cf-dia').value)||null,dia_fin:parseInt(document.getElementById('cf-dia-fin').value)||null,mes_fin:document.getElementById('cf-mes-fin').value||null,tipo:document.getElementById('cf-tipo').value,imp:document.getElementById('cf-imp').value,cat:document.getElementById('cf-cat').value,notas:document.getElementById('cf-notas').value.trim()};
   if(eCId){S.comps=S.comps.map(c=>c.id===eCId?obj:c);}else{S.comps.push(obj);}
   saveS();closeCF();rAC();
   built['cal']=false;built['tmp']=false;
