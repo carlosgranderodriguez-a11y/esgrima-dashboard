@@ -249,6 +249,15 @@ tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.02)
 <div id="pnl-cal" class="pnl">
   <div class="st">Calendario de carga</div>
   <div class="ss">Periodización semanal · Sep 2025 – Ago 2026 · <span style="color:var(--bl);cursor:pointer" onclick="T('adm')">Editar en Gestión →</span></div>
+  <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+    <span style="font-family:var(--fm);font-size:10px;color:var(--mu);letter-spacing:.08em">VER:</span>
+    <button class="fbtn fon" id="cal-f-all"    onclick="setCalFilter('all',this)">Todas</button>
+    <button class="fbtn foff" id="cal-f-senior" onclick="setCalFilter('Senior',this)">Senior</button>
+    <button class="fbtn foff" id="cal-f-sub23"  onclick="setCalFilter('Sub23',this)">Sub23</button>
+    <button class="fbtn foff" id="cal-f-m20"    onclick="setCalFilter('M20',this)">M20</button>
+    <button class="fbtn foff" id="cal-f-m17"    onclick="setCalFilter('M17',this)">M17</button>
+    <button class="fbtn foff" id="cal-f-nac"    onclick="setCalFilter('Nacional',this)">Nacional</button>
+  </div>
   <div class="cleg">
     <div class="cli"><div class="cld" style="background:rgba(80,240,144,.3)"></div>Acumulación</div>
     <div class="cli"><div class="cld" style="background:rgba(80,200,240,.3)"></div>Transformación/Intens.</div>
@@ -909,6 +918,14 @@ const CAL=[
 ];
 const PH={'A':'phA','A+':'phAp','A++':'phApp','I':'phI','T':'phT','R':'phR','C':'phC','RC':'phRC','':'emp'};
 const PC={'A':'#50f090','A+':'#50f090','A++':'#50f090','I':'#50c8f0','T':'#50c8f0','R':'#f0a050','C':'#f08080','RC':'#f06060','':'var(--mu)'};
+let calFilter='all';
+function setCalFilter(f,btn){
+  calFilter=f;
+  document.querySelectorAll('[id^="cal-f-"]').forEach(b=>b.className='fbtn foff');
+  btn.className='fbtn fon';
+  built['cal']=false;
+  bCal();
+}
 function bCal(){
   const dias=['L','M','X','J','V','S','D'];
   let h='';
@@ -920,9 +937,16 @@ function bCal(){
       // Match by sem, OR by mes + dia range overlapping this week
       const inWeek=(c)=>c.dia?(c.dia<=wl.e&&(c.dia_fin||c.dia)>=wl.s):c.sem===wl.n;
       const allMatch=S.comps.filter(c=>c.mes===m.mes?inWeek(c):c.sem===wl.n);
-      const cs=allMatch.filter(c=>['Senior','Todos'].includes(c.cat)&&c.tipo!=='Concentración');
-      const cn=allMatch.filter(c=>c.cat==='Nacional'&&c.tipo!=='Concentración');
-      const cc=allMatch.filter(c=>c.tipo==='Concentración');
+      // Apply category filter
+      const catMatch=(c)=>{
+        if(calFilter==='all')return true;
+        if(calFilter==='Senior')return ['Senior','Todos'].includes(c.cat);
+        if(calFilter==='Nacional')return c.cat==='Nacional';
+        return c.cat===calFilter||c.cat==='Todos';
+      };
+      const cs=allMatch.filter(c=>catMatch(c)&&c.tipo!=='Concentración'&&c.cat!=='Nacional');
+      const cn=allMatch.filter(c=>c.cat==='Nacional'&&c.tipo!=='Concentración'&&catMatch(c));
+      const cc=allMatch.filter(c=>c.tipo==='Concentración'&&catMatch(c));
       h+=`<div class="wr"><div class="wl">S${wl.n}</div>`;
       const off=(wl.n===m.wks[0].n)?m.off-1:0;
       for(let i=0;i<off;i++)h+=`<div class="cd emp"></div>`;
