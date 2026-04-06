@@ -354,6 +354,7 @@ tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.02)
     <span class="adl">DATOS</span>
     <span style="font-family:var(--fm);font-size:11px;color:var(--ok)">✓ Guardado automático</span>
     <span style="font-family:var(--fm);font-size:10px;color:var(--mu)" id="sync-status">↺ Sincronizando...</span>
+    <button class="btn" style="margin-left:auto;font-size:11px;padding:5px 12px;color:var(--bl);border-color:rgba(80,200,240,.3);background:rgba(80,200,240,.05)" onclick="forceSave()">☁ Guardar todo en Sheet</button>
     <button class="btn btd" style="margin-left:auto;font-size:11px;padding:5px 11px" onclick="resetAll()">↺ Restaurar default</button>
   </div>
   <div class="ads">
@@ -1270,6 +1271,33 @@ function T(id){
 // ═══════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════
+async function forceSave(){
+  const btn=event.target;
+  btn.textContent='☁ Guardando...';
+  btn.disabled=true;
+  try{
+    const r=await fetch(SCRIPT_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'save',team:STORE_KEY,data:S}),
+      signal:AbortSignal.timeout(15000)
+    });
+    const j=await r.json();
+    if(j.ok){
+      toast('✓ Datos guardados en Google Sheet');
+      const ss=document.getElementById('sync-status');
+      if(ss){ss.textContent='✓ Guardado en Sheet';ss.style.color='var(--ok)';}
+    } else {
+      toast('⚠ Error al guardar: '+(j.error||'desconocido'));
+    }
+  }catch(e){
+    toast('⚠ Sin conexión al Sheet');
+  }finally{
+    btn.textContent='☁ Guardar todo en Sheet';
+    btn.disabled=false;
+  }
+}
+
 built['res']=true;
 bNext();
 loadData();
