@@ -527,9 +527,7 @@ function saveS(){
 async function saveToSheet(){
   try{
     const data=encodeURIComponent(JSON.stringify(S));
-    await fetch(SCRIPT_URL+'?action=save&team='+STORE_KEY+'&data='+data,{
-      signal:AbortSignal.timeout(10000)
-    });
+    await jsonp(SCRIPT_URL+'?action=save&team='+STORE_KEY+'&data='+data);
   }catch(e){
     console.log('No se pudo guardar en Sheet:', e.message);
   }
@@ -1275,10 +1273,7 @@ async function forceSave(){
   btn.disabled=true;
   try{
     const data=encodeURIComponent(JSON.stringify(S));
-    const r=await fetch(SCRIPT_URL+'?action=save&team='+STORE_KEY+'&data='+data,{
-      signal:AbortSignal.timeout(15000)
-    });
-    const j=await r.json();
+    const j=await jsonp(SCRIPT_URL+'?action=save&team='+STORE_KEY+'&data='+data);
     if(j.ok){
       toast('✓ Datos guardados en Google Sheet');
       const ss=document.getElementById('sync-status');
