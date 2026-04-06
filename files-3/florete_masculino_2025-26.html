@@ -410,7 +410,7 @@ tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.02)
 // ═══════════════════════════════════════
 const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vSH56ayIJKpmCtT65kNv3rMRMf8vytNtvftlOB4Nd8eTaf6Q12l9iPwKbrrCpeg3vHH1nXRSac-8TEN/pub?output=csv';
 const STORE_KEY='florete26masc';
-const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxatq5KfalFg_Rb1r7cev_5h8L5qx5hUSFdG3UbxKJ-NYQpCHIglZCjxyR5r-NityFY/exec';
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxOWUdgQKMBaG60N2MOZkoQLhvG70mfjBE7BPt5ugAnKXIEU-yBD75MIGwLsZ4zBU8F/exec';
 
 // ═══════════════════════════════════════
 // COLORS
@@ -526,10 +526,8 @@ function saveS(){
 }
 async function saveToSheet(){
   try{
-    await fetch(SCRIPT_URL,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'save',team:STORE_KEY,data:S}),
+    const data=encodeURIComponent(JSON.stringify(S));
+    await fetch(SCRIPT_URL+'?action=save&team='+STORE_KEY+'&data='+data,{
       signal:AbortSignal.timeout(10000)
     });
   }catch(e){
@@ -1276,10 +1274,8 @@ async function forceSave(){
   btn.textContent='☁ Guardando...';
   btn.disabled=true;
   try{
-    const r=await fetch(SCRIPT_URL,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'save',team:STORE_KEY,data:S}),
+    const data=encodeURIComponent(JSON.stringify(S));
+    const r=await fetch(SCRIPT_URL+'?action=save&team='+STORE_KEY+'&data='+data,{
       signal:AbortSignal.timeout(15000)
     });
     const j=await r.json();
