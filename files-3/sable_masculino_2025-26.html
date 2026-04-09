@@ -347,6 +347,37 @@ tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.02)
 </div>
 
 <!-- GESTIÓN -->
+<div id="pnl-atl-ind" class="pnl">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;flex-wrap:wrap">
+    <div id="ai-avatar" style="width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:14px;font-weight:700"></div>
+    <div>
+      <div id="ai-name" style="font-family:var(--fh);font-size:22px;font-weight:700"></div>
+      <div id="ai-sub" style="font-family:var(--fm);font-size:11px;color:var(--mu)"></div>
+    </div>
+    <button onclick="T('atl')" style="margin-left:auto;background:none;border:1px solid var(--bd);color:var(--mu);padding:5px 12px;border-radius:6px;cursor:pointer;font-family:var(--fm);font-size:11px">← Volver a equipo</button>
+  </div>
+  <!-- Filters -->
+  <div style="display:flex;gap:8px;margin:14px 0;flex-wrap:wrap;align-items:center">
+    <span style="font-family:var(--fm);font-size:10px;color:var(--mu);letter-spacing:.08em">PERÍODO:</span>
+    <button class="fbtn" id="ai-f1" onclick="setAiFilter(1,this)">Hoy</button>
+    <button class="fbtn fon" id="ai-f7" onclick="setAiFilter(7,this)">7 días</button>
+    <button class="fbtn" id="ai-f30" onclick="setAiFilter(30,this)">30 días</button>
+    <button class="fbtn" id="ai-f0" onclick="setAiFilter(0,this)">Todo</button>
+  </div>
+  <!-- Stats -->
+  <div id="ai-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px"></div>
+  <!-- Chart -->
+  <div class="card mb">
+    <div class="ct">Evolución</div>
+    <div style="position:relative;height:220px"><canvas id="ai-chart"></canvas></div>
+  </div>
+  <!-- History table -->
+  <div class="card">
+    <div class="ct">Historial completo</div>
+    <div id="ai-table"></div>
+  </div>
+</div>
+
 <div id="pnl-adm" class="pnl">
   <div class="st">Gestión de datos</div>
   <div class="ss">Añade, edita o elimina competiciones y semanas · Los cambios se guardan automáticamente</div>
@@ -1266,6 +1297,13 @@ function clearDayData(){
 // ═══════════════════════════════════════
 const built={};
 function T(id){
+  if(id==='atl-ind'){
+    document.querySelectorAll('.pnl').forEach(p=>p.style.display='none');
+    document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('on'));
+    document.getElementById('pnl-atl-ind').style.display='block';
+    document.getElementById('tab-atl-ind').classList.add('on');
+    return;
+  }
   document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('on'));
   document.querySelectorAll('.pnl').forEach(p=>p.classList.remove('on'));
   document.querySelector(`.ntab[onclick="T('${id}')"]`)?.classList.add('on');
@@ -1320,8 +1358,116 @@ loadData();
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDayPanel();});
 </script>
 
-let drawerChart=null;
+let aiChart=null;
+let aiFilter=7;
+let aiAthl=null;
+
+function setAiFilter(days,btn){
+  aiFilter=days;
+  document.querySelectorAll('[id^="ai-f"]').forEach(b=>b.className='fbtn foff');
+  btn.className='fbtn fon';
+  if(aiAthl)bAiPanel(aiAthl);
+}
+
 function openAthlDrawer(name){
+  const a=ATHL.find(x=>x.name===name);
+  if(!a)return;
+  aiAthl=a;
+  // Show tab
+  const tab=document.getElementById('tab-atl-ind');
+  if(tab){tab.style.display='flex';document.getElementById('tab-atl-name').textContent=a.name;}
+  // Navigate
+  T('atl-ind');
+  bAiPanel(a);
+}
+
+function bAiPanel(a){
+  // Filter rows by aiFilter
+  const now=new Date();
+  const cutoff=aiFilter===1?new Date(now.getFullYear(),now.getMonth(),now.getDate()):
+               aiFilter>0?new Date(now-aiFilter*86400000):new Date(0);
+  const rows=(a.rows||[]).filter(r=>r.d&&r.d>=cutoff).sort((x,y)=>x.d-y.d);
+
+  // Avatar
+  const av=document.getElementById('ai-avatar');
+  if(av){av.style.background=a.ab;av.style.color=a.ac;av.textContent=INI(a.name);}
+  document.getElementById('ai-name').textContent=a.name;
+  document.getElementById('ai-sub').textContent=rows.length+' respuestas en el período';
+
+  // Stats
+  const avg=arr=>arr.length?Math.round(arr.reduce((s,v)=>s+v,0)/arr.length*10)/10:null;
+  const fat=avg(rows.filter(r=>r.fat!==null).map(r=>r.fat));
+  const fis=avg(rows.filter(r=>r.fis!==null).map(r=>r.fis));
+  const ani=avg(rows.filter(r=>r.ani!==null).map(r=>r.ani));
+  const sue=avg(rows.filter(r=>r.sue!==null).map(r=>r.sue));
+  const stats=[
+    {label:'FATIGA',val:fat,color:'#f0a050'},
+    {label:'FÍSICO',val:fis,color:'#50c8f0'},
+    {label:'ÁNIMO',val:ani,color:'#c8f050'},
+    {label:'SUEÑO',val:sue,color:'#50f090'},
+  ];
+  document.getElementById('ai-stats').innerHTML=stats.map(s=>`
+    <div style="background:var(--bg3);border-radius:8px;padding:14px;text-align:center">
+      <div style="font-family:var(--fm);font-size:9px;color:var(--mu);letter-spacing:.08em;margin-bottom:6px">${s.label}</div>
+      <div style="font-family:var(--fh);font-size:28px;font-weight:700;color:${s.color}">${s.val??'—'}</div>
+      <div style="font-family:var(--fm);font-size:9px;color:var(--mu)">/ 5</div>
+    </div>`).join('');
+
+  // Chart
+  if(aiChart){aiChart.destroy();aiChart=null;}
+  const ctx=document.getElementById('ai-chart');
+  if(ctx&&rows.length>0){
+    const labels=rows.map(r=>r.d.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'}));
+    aiChart=new Chart(ctx,{
+      type:'bar',
+      data:{labels,datasets:[
+        {label:'Fatiga',data:rows.map(r=>r.fat),backgroundColor:'rgba(240,160,80,.75)',borderRadius:3},
+        {label:'Físico',data:rows.map(r=>r.fis),backgroundColor:'rgba(80,200,240,.75)',borderRadius:3},
+        {label:'Ánimo',data:rows.map(r=>r.ani),backgroundColor:'rgba(200,240,80,.75)',borderRadius:3},
+        {label:'Sueño',data:rows.map(r=>r.sue),backgroundColor:'rgba(80,240,144,.75)',borderRadius:3},
+      ]},
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{labels:{color:'#9ca3af',font:{size:10,family:'DM Mono'},boxWidth:10}}},
+        scales:{
+          x:{ticks:{color:'#6b7280',font:{size:9},maxRotation:45},grid:{color:'rgba(255,255,255,.04)'}},
+          y:{min:0,max:5,ticks:{color:'#6b7280',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}
+        }
+      }
+    });
+  }
+
+  // History table
+  const fmt=d=>d.toLocaleDateString('es-ES',{weekday:'short',day:'2-digit',month:'short'});
+  document.getElementById('ai-table').innerHTML=`
+    <table style="width:100%;border-collapse:collapse;font-family:var(--fm);font-size:12px">
+      <thead><tr style="border-bottom:2px solid var(--bd)">
+        <th style="text-align:left;padding:6px 4px;color:var(--mu);font-weight:500;font-size:10px">FECHA</th>
+        <th style="padding:6px 4px;color:#f0a050;font-size:10px">FAT</th>
+        <th style="padding:6px 4px;color:#50c8f0;font-size:10px">FIS</th>
+        <th style="padding:6px 4px;color:#c8f050;font-size:10px">ANI</th>
+        <th style="padding:6px 4px;color:#50f090;font-size:10px">SUE</th>
+        <th style="text-align:left;padding:6px 4px;color:var(--mu);font-size:10px">LESIÓN / CICLO</th>
+      </tr></thead>
+      <tbody>${[...rows].reverse().map(r=>`
+        <tr style="border-bottom:1px solid var(--bd)">
+          <td style="padding:7px 4px;color:var(--mu)">${fmt(r.d)}</td>
+          <td style="padding:7px 4px;text-align:center;color:${clr(r.fat,true)};font-weight:600">${r.fat??'—'}</td>
+          <td style="padding:7px 4px;text-align:center;color:${clr(r.fis,false)};font-weight:600">${r.fis??'—'}</td>
+          <td style="padding:7px 4px;text-align:center;color:${clr(r.ani,false)};font-weight:600">${r.ani??'—'}</td>
+          <td style="padding:7px 4px;text-align:center;color:${clr(r.sue,false)};font-weight:600">${r.sue??'—'}</td>
+          <td style="padding:7px 4px;font-size:10px">
+            ${r.les?`<span style="color:#f08080">⚠ ${r.les.slice(0,25)}</span>`:''}
+            ${r.ciclo?`<span style="color:#d060f0;margin-left:4px">🌙 ${r.ciclo.slice(0,18)}</span>`:''}
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  `||'<div style="color:var(--mu);padding:16px 0;font-size:12px">Sin respuestas en este período</div>';
+}
+
+let drawerChart=null;
+function openAthlDrawer_old(name){
   const a=ATHL.find(x=>x.name===name);
   if(!a)return;
   // Header
@@ -1397,23 +1543,6 @@ if('serviceWorker' in navigator){
 }
 </script>
 
-<!-- Athlete History Drawer -->
-<div id="athl-drawer" style="position:fixed;top:0;right:-420px;width:420px;height:100vh;background:var(--bg2);border-left:1px solid var(--bd);z-index:1000;transition:right .3s ease;overflow-y:auto;padding:0">
-  <div style="position:sticky;top:0;background:var(--bg2);border-bottom:1px solid var(--bd);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;z-index:10">
-    <div>
-      <div id="drawer-name" style="font-family:var(--fh);font-size:18px;font-weight:700"></div>
-      <div id="drawer-sub" style="font-family:var(--fm);font-size:11px;color:var(--mu);margin-top:2px"></div>
-    </div>
-    <button onclick="closeAthlDrawer()" style="background:none;border:1px solid var(--bd);color:var(--mu);width:32px;height:32px;border-radius:6px;cursor:pointer;font-size:16px">×</button>
-  </div>
-  <div style="padding:16px 20px">
-    <div id="drawer-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px"></div>
-    <div style="font-family:var(--fm);font-size:10px;color:var(--mu);letter-spacing:.08em;margin-bottom:8px">EVOLUCIÓN</div>
-    <div style="position:relative;height:180px;margin-bottom:20px"><canvas id="drawer-chart"></canvas></div>
-    <div style="font-family:var(--fm);font-size:10px;color:var(--mu);letter-spacing:.08em;margin-bottom:8px">HISTORIAL DE RESPUESTAS</div>
-    <div id="drawer-rows"></div>
-  </div>
-</div>
-<div id="athl-overlay" onclick="closeAthlDrawer()" style="position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:999;display:none"></div>
+
 </body>
 </html>
