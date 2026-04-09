@@ -411,6 +411,17 @@ tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.02)
 const CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vQBv-dYvKkDDrXnJwY4gdGTAYj-IL34lcVsx3TL8cjspdU_hOdgi6wTLV7UDJVafIdtldOFMj34BSn6/pub?gid=1490399670&single=true&output=csv';
 const STORE_KEY='esgrima26fem';
 const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxOWUdgQKMBaG60N2MOZkoQLhvG70mfjBE7BPt5ugAnKXIEU-yBD75MIGwLsZ4zBU8F/exec';
+function jsonp(url){
+  return new Promise((resolve,reject)=>{
+    const cb='_cb'+Date.now()+'_'+Math.random().toString(36).slice(2);
+    const s=document.createElement('script');
+    const timer=setTimeout(()=>{delete window[cb];s.remove();reject(new Error('timeout'));},15000);
+    window[cb]=d=>{clearTimeout(timer);delete window[cb];s.remove();resolve(d);};
+    s.onerror=()=>{clearTimeout(timer);delete window[cb];s.remove();reject(new Error('JSONP error'));};
+    s.src=url+(url.includes('?')?'&':'?')+'callback='+cb;
+    document.head.appendChild(s);
+  });
+}
 
 // ═══════════════════════════════════════
 // COLORS
@@ -500,22 +511,17 @@ function loadS(){
 }
 async function syncFromSheet(){
   try{
-    const r=await fetch(SCRIPT_URL+'?action=load&team='+STORE_KEY,{signal:AbortSignal.timeout(10000)});
-    const j=await r.json();
-    if(j.data&&j.data.comps&&j.data.comps.length>0){
+    const j=await jsonp(SCRIPT_URL+'?action=load&team='+STORE_KEY);
+    if(j.data){
       S=j.data;if(!S.days)S.days={};
-      // Update localStorage with Sheet data
       localStorage.setItem(STORE_KEY,JSON.stringify(S));
-      // Rebuild UI
       bNext();
       if(built['cal'])bCal();
       if(built['tmp']){bTL();bTCtbl();}
       if(built['adm']){rAC();rAW();}
-      console.log('Datos sincronizados desde Sheet: '+S.comps.length+' competiciones');
       const ss=document.getElementById('sync-status');if(ss)ss.textContent='✓ Sincronizado con Sheet';
     }
   }catch(e){
-    console.log('Sin conexión al Sheet, usando datos locales');
     const ss=document.getElementById('sync-status');if(ss){ss.textContent='⚠ Sin conexión al Sheet';ss.style.color='var(--wn)';}
   }
 }
@@ -526,20 +532,18 @@ function saveS(){
 }
 async function saveToSheet(){
   try{
-    // Only save comps+weeks+nid (not days which are large)
-    const slim={comps:S.comps,weeks:S.weeks,nid:S.nid};
-    const data=encodeURIComponent(JSON.stringify(slim));
-    if(data.length>6000){
-      // Split: save comps first, then weeks
-      const d1=encodeURIComponent(JSON.stringify({comps:S.comps,nid:S.nid,weeks:[]}));
-      const d2=encodeURIComponent(JSON.stringify({comps:[],nid:S.nid,weeks:S.weeks}));
-      await jsonp(SCRIPT_URL+'?action=savecomps&team='+STORE_KEY+'&data='+d1);
-      await jsonp(SCRIPT_URL+'?action=saveweeks&team='+STORE_KEY+'&data='+d2);
-    } else {
-      await jsonp(SCRIPT_URL+'?action=save&team='+STORE_KEY+'&data='+data);
+    // Save weeks (one call)
+    const wd=encodeURIComponent(JSON.stringify({weeks:S.weeks,nid:S.nid}));
+    await jsonp(SCRIPT_URL+'?action=saveChunk&team='+STORE_KEY+'&chunk=weeks&data='+wd);
+    // Save comps in batches of 10
+    const batchSize=10;
+    for(let i=0;i<S.comps.length;i+=batchSize){
+      const batch=S.comps.slice(i,i+batchSize);
+      const cd=encodeURIComponent(JSON.stringify({comps:batch,offset:i,total:S.comps.length}));
+      await jsonp(SCRIPT_URL+'?action=saveChunk&team='+STORE_KEY+'&chunk=comps&data='+cd);
     }
   }catch(e){
-    console.log('No se pudo guardar en Sheet:', e.message);
+    console.log('No se pudo guardar en Sheet:',e.message);
   }
 }
 function resetAll(){if(!confirm('¿Restaurar datos originales?'))return;localStorage.removeItem(STORE_KEY);location.reload();}
