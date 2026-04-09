@@ -1356,7 +1356,6 @@ built['res']=true;
 bNext();
 loadData();
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDayPanel();});
-</script>
 
 let aiChart=null;
 let aiFilter=7;
@@ -1537,6 +1536,9 @@ function closeAthlDrawer(){
   document.getElementById('athl-drawer').style.right='-420px';
   document.getElementById('athl-overlay').style.display='none';
 }
+
+</script>
+
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{});});
