@@ -362,7 +362,7 @@ tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.02)
     <div class="iform" id="comp-form">
       <div class="iforamt" id="cf-title">NUEVA COMPETICIÓN</div>
       <div class="fg2"><div class="fg"><label>NOMBRE *</label><input id="cf-name" placeholder="Nombre de la competición"></div><div class="fg"><label>LUGAR</label><input id="cf-lugar" placeholder="Ciudad / País"></div></div>
-      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:8px">
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:8px">
         <div class="fg"><label>MES INICIO *</label><select id="cf-mes"><option>Sep 2025</option><option>Oct 2025</option><option>Nov 2025</option><option>Dic 2025</option><option>Ene 2026</option><option>Feb 2026</option><option>Mar 2026</option><option>Abr 2026</option><option>May 2026</option><option>Jun 2026</option><option>Jul 2026</option><option>Ago 2026</option><option>Sep 2026</option></select></div>
         <div class="fg"><label>MES FIN</label><select id="cf-mes-fin"><option value="">— mismo mes —</option><option>Sep 2025</option><option>Oct 2025</option><option>Nov 2025</option><option>Dic 2025</option><option>Ene 2026</option><option>Feb 2026</option><option>Mar 2026</option><option>Abr 2026</option><option>May 2026</option><option>Jun 2026</option><option>Jul 2026</option><option>Ago 2026</option><option>Sep 2026</option></select></div>
         <div class="fg"><label>Nº SEMANA</label><input id="cf-sem" type="number" min="1" max="53" placeholder="ej. 10"></div>
@@ -474,9 +474,6 @@ const DCMPS=[
   {id:39,name:'Cto. España M20/M23',mes:'Mar 2026',sem:27,dia:null,dia_fin:null,tipo:'Campeonato',cat:'Nacional',imp:'alta',lugar:'',notas:''},
   {id:40,name:'Tnr Logroño ABS',mes:'Mar 2026',sem:29,dia:26,tipo:'Torneo',cat:'Nacional',imp:'baja',lugar:'Logroño',notas:''},
   {id:41,name:'Cto España ABS',mes:'Jun 2026',sem:40,dia:null,dia_fin:null,tipo:'Campeonato',cat:'Nacional',imp:'alta',lugar:'',notas:''},
-  {id:101,name:'Europeo Sub23',mes:'Abr 2026',sem:33,dia:13,dia_fin:19,tipo:'Europeo',cat:'Sub23',imp:'alta',lugar:'',notas:'Santi, Casaus, Jaime, Yago, Claudio, Andrés'},
-  {id:102,name:'GP FIE Seoul',mes:'Abr 2026',sem:33,dia:13,dia_fin:19,tipo:'GP',cat:'Senior',imp:'alta',lugar:'Seoul',notas:''},
-  {id:103,name:'Copa Mundo Padova',mes:'Abr 2026',sem:34,dia:20,dia_fin:26,tipo:'Copa Mundo',cat:'Senior',imp:'alta',lugar:'Padova',notas:''},
 ];
 const DWKS=[
   {id:1,num:1,mes:'Sep 2025',fase:'A',rpe:2.4,notas:'Inicio temporada'},{id:2,num:2,mes:'Sep 2025',fase:'A+',rpe:5.0,notas:''},{id:3,num:3,mes:'Sep 2025',fase:'A++',rpe:null,notas:''},{id:4,num:4,mes:'Sep 2025',fase:'C',rpe:3.2,notas:''},{id:5,num:5,mes:'Sep 2025',fase:'T',rpe:3.0,notas:''},
@@ -486,7 +483,7 @@ const DWKS=[
   {id:19,num:19,mes:'Ene 2026',fase:'RC',rpe:null,notas:''},{id:20,num:20,mes:'Ene 2026',fase:'A',rpe:3.0,notas:''},{id:21,num:21,mes:'Ene 2026',fase:'T',rpe:3.5,notas:''},{id:22,num:22,mes:'Ene 2026',fase:'R',rpe:2.5,notas:''},
   {id:23,num:23,mes:'Feb 2026',fase:'C',rpe:null,notas:''},{id:24,num:24,mes:'Feb 2026',fase:'A',rpe:3.5,notas:''},{id:25,num:25,mes:'Feb 2026',fase:'A+',rpe:4.0,notas:''},{id:26,num:26,mes:'Feb 2026',fase:'T',rpe:3.5,notas:''},
   {id:27,num:27,mes:'Mar 2026',fase:'RC',rpe:null,notas:''},{id:28,num:28,mes:'Mar 2026',fase:'A',rpe:3.0,notas:''},{id:29,num:29,mes:'Mar 2026',fase:'RC',rpe:null,notas:''},{id:30,num:30,mes:'Mar 2026',fase:'A',rpe:3.5,notas:''},{id:31,num:31,mes:'Mar 2026',fase:'A+',rpe:4.0,notas:''},
-  {id:32,num:32,mes:'Abr 2026',fase:'A',rpe:3.2,notas:''},{id:33,num:33,mes:'Abr 2026',fase:'RC',rpe:5.0,notas:''},{id:34,num:34,mes:'Abr 2026',fase:'C',rpe:5.0,notas:''},{id:35,num:35,mes:'Abr 2026',fase:'T',rpe:2.5,notas:''},
+  {id:32,num:32,mes:'Abr 2026',fase:'A++',rpe:4.5,notas:''},{id:33,num:33,mes:'Abr 2026',fase:'T',rpe:3.5,notas:''},{id:34,num:34,mes:'Abr 2026',fase:'R',rpe:3.0,notas:''},{id:35,num:35,mes:'Abr 2026',fase:'C',rpe:null,notas:''},
   {id:36,num:36,mes:'May 2026',fase:'RC',rpe:null,notas:''},{id:37,num:37,mes:'May 2026',fase:'A',rpe:3.5,notas:''},{id:38,num:38,mes:'May 2026',fase:'RC',rpe:null,notas:''},{id:39,num:39,mes:'May 2026',fase:'A',rpe:3.0,notas:''},
   {id:40,num:40,mes:'Jun 2026',fase:'C',rpe:null,notas:''},{id:41,num:41,mes:'Jun 2026',fase:'T',rpe:3.5,notas:''},{id:42,num:42,mes:'Jun 2026',fase:'RC',rpe:null,notas:''},{id:43,num:43,mes:'Jun 2026',fase:'A',rpe:2.5,notas:''},
   {id:44,num:44,mes:'Jul 2026',fase:'A+',rpe:3.5,notas:''},{id:45,num:45,mes:'Jul 2026',fase:'T',rpe:3.0,notas:''},{id:46,num:46,mes:'Jul 2026',fase:'RC',rpe:null,notas:''},{id:47,num:47,mes:'Jul 2026',fase:'T',rpe:2.0,notas:''},
@@ -516,7 +513,7 @@ async function syncFromSheet(){
   try{
     const j=await jsonp(SCRIPT_URL+'?action=load&team='+STORE_KEY);
     if(j.data){
-      S=j.data;if(!S.days)S.days={};
+      S=j.data;if(!S.days)S.days={};if(!S.comps)S.comps=JSON.parse(JSON.stringify(DCMPS));if(!S.weeks)S.weeks=JSON.parse(JSON.stringify(DWKS));
       localStorage.setItem(STORE_KEY,JSON.stringify(S));
       bNext();
       if(built['cal'])bCal();
@@ -560,7 +557,7 @@ const clr=(v,inv=false)=>inv?(v>3.5?'var(--dg)':v>2.5?'var(--wn)':'var(--ok)'):(
 const INI=n=>n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
 const IB=i=>i==='alta'?'b-dg':i==='media'?'b-wn':'b-gr';
 const TB=t=>['Copa Mundo','Mundial','JJMM'].includes(t)?'b-dg':['Europeo','Campeonato'].includes(t)?'b-bl':t==='GP'?'b-ac':t==='Concentración'?'b-conc':'b-gr';
-const sortC=arr=>[...arr].sort((a,b)=>MES_IDX.indexOf(a.mes)-MES_IDX.indexOf(b.mes)||(a.sem-b.sem));
+const sortC=arr=>arr&&arr.length?[...arr].sort((a,b)=>MES_IDX.indexOf(a.mes)-MES_IDX.indexOf(b.mes)||(a.sem-b.sem)):[];
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.opacity='1';setTimeout(()=>t.style.opacity='0',2400);}
 const avg=arr=>arr.length?Math.round(arr.reduce((s,v)=>s+v,0)/arr.length*10)/10:0;
 
@@ -692,7 +689,7 @@ function processRows(rows){
     const sue=pf(row[iSue]);
     const les=(row[iLes]||'').trim();
     const hasL=les&&les.length>1&&!['no','nan','ninguno','ninguna'].includes(les.toLowerCase());
-    if(!byEmail[email])byEmail[email]={fat:[],fis:[],ani:[],sue:[],les:[],ciclo:[],n:0};
+    if(!byEmail[email])byEmail[email]={fat:[],fis:[],ani:[],sue:[],les:[],ciclo:[],rows:[],n:0};
     if(fat!==null)byEmail[email].fat.push(fat);
     if(fis!==null)byEmail[email].fis.push(fis);
     if(ani!==null)byEmail[email].ani.push(ani);
@@ -700,6 +697,7 @@ function processRows(rows){
     if(hasL)byEmail[email].les.push(les);
     const cicloVal=iCiclo>=0?(row[iCiclo]||'').trim():'';
     if(cicloVal&&cicloVal.length>0)byEmail[email].ciclo.push(cicloVal);
+    byEmail[email].rows.push({d:rd,fat,fis,ani,sue,les:hasL?les:'',ciclo:cicloVal});
     byEmail[email].n++;
     const mon=getMonday(row[iTs]);
     if(mon){
@@ -719,7 +717,8 @@ function processRows(rows){
     else name=email.split('@')[0];
     // Get most recent ciclo phase
     const cicloRecent=d.ciclo.length?d.ciclo[d.ciclo.length-1]:'';
-    return{name:name.slice(0,16),fat:avg(d.fat),fis:avg(d.fis),ani:avg(d.ani),sue:avg(d.sue),n:d.n,ln:d.les.length,les:[...new Set(d.les)].slice(0,3),ciclo:cicloRecent,ac:ACL[idx%ACL.length],ab:ABG[idx%ABG.length]};
+    const rows=[...d.rows].sort((a,b)=>a.d-b.d);
+    return{name:name.slice(0,16),fat:avg(d.fat),fis:avg(d.fis),ani:avg(d.ani),sue:avg(d.sue),n:d.n,ln:d.les.length,les:[...new Set(d.les)].slice(0,3),ciclo:cicloRecent,rows:rows,ac:ACL[idx%ACL.length],ab:ABG[idx%ABG.length]};
   }).filter(a=>a.n>0);
 
   WKL=Object.entries(byWeek).sort((a,b)=>a[0].localeCompare(b[0])).map(([mon,d])=>{
@@ -758,7 +757,7 @@ function bTeam(){
   const thC=document.getElementById('th-ciclo');
   if(thC)thC.style.display=hasCiclo?'':'none';
   document.getElementById('r-team').innerHTML=ATHL.length?ATHL.map(a=>`<tr>
-    <td><span style="display:flex;align-items:center;gap:7px"><span style="width:24px;height:24px;border-radius:50%;background:${a.ab};display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:8px;font-weight:700;color:${a.ac}">${INI(a.name)}</span>${a.name}</span></td>
+    <td><span style="display:flex;align-items:center;gap:7px;cursor:pointer" onclick="openAthlDrawer('${a.name}')"><span style="width:24px;height:24px;border-radius:50%;background:${a.ab};display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:8px;font-weight:700;color:${a.ac}">${INI(a.name)}</span><span style="color:var(--bl);text-decoration:underline dotted">${a.name}</span></span></td>
     <td style="color:${clr(a.fat,true)};font-family:var(--fm)">${R1(a.fat)}</td>
     <td style="color:${clr(a.fis)};font-family:var(--fm)">${R1(a.fis)}</td>
     <td style="color:${clr(a.sue)};font-family:var(--fm)">${R1(a.sue)}</td>
@@ -1002,7 +1001,7 @@ function bCal(){
           <div class="dn">${d}</div>
           <div class="dph" style="color:${PC[showFase]||'var(--mu)'}">${showFase}</div>
           ${wd.rpe?`<div style="font-family:var(--fm);font-size:9px;color:rgba(200,240,80,.6)">RPE ${wd.rpe}</div>`:''}
-          ${ddata.nota?`<div style="font-size:8px;margin-top:2px;color:var(--bl);line-height:1.2;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${ddata.nota}</div>`:''}
+          ${ddata.nota?`<div style="font-size:9px;margin-top:3px;color:var(--bl);line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical">${ddata.nota}</div>`:''}
           ${dayCs.length?`<div class="dcmp">${dayCs.map(c=>c.name).join(', ')}</div>`:''}
           ${dayCn.length?`<div class="dnac">${dayCn[0].name.slice(0,14)}</div>`:''}
           ${dayCC.length?`<div style="font-size:9px;margin-top:2px;line-height:1.3;color:#c850f0">${dayCC.map(c=>c.name).join(', ')}</div>`:''}
@@ -1320,10 +1319,101 @@ bNext();
 loadData();
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDayPanel();});
 </script>
+
+let drawerChart=null;
+function openAthlDrawer(name){
+  const a=ATHL.find(x=>x.name===name);
+  if(!a)return;
+  // Header
+  document.getElementById('drawer-name').textContent=a.name;
+  document.getElementById('drawer-sub').textContent=a.n+' respuestas en el período seleccionado';
+  // Stats cards
+  const stats=[
+    {label:'FATIGA',val:R1(a.fat),color:'#f0a050'},
+    {label:'FÍSICO',val:R1(a.fis),color:'#50c8f0'},
+    {label:'ÁNIMO',val:R1(a.ani),color:'#c8f050'},
+    {label:'SUEÑO',val:R1(a.sue),color:'#50f090'},
+  ];
+  document.getElementById('drawer-stats').innerHTML=stats.map(s=>`
+    <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center">
+      <div style="font-family:var(--fm);font-size:9px;color:var(--mu);letter-spacing:.08em;margin-bottom:4px">${s.label}</div>
+      <div style="font-family:var(--fh);font-size:22px;font-weight:700;color:${s.color}">${s.val||'—'}</div>
+      <div style="font-family:var(--fm);font-size:9px;color:var(--mu)">/ 5</div>
+    </div>`).join('');
+  // Chart
+  if(drawerChart){drawerChart.destroy();drawerChart=null;}
+  const rows=a.rows||[];
+  const labels=rows.map(r=>r.d?r.d.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'}):'');
+  const ctx=document.getElementById('drawer-chart');
+  if(ctx&&rows.length>0){
+    drawerChart=new Chart(ctx,{
+      type:'bar',
+      data:{
+        labels,
+        datasets:[
+          {label:'Fatiga',data:rows.map(r=>r.fat),backgroundColor:'rgba(240,160,80,.7)',borderRadius:3},
+          {label:'Físico',data:rows.map(r=>r.fis),backgroundColor:'rgba(80,200,240,.7)',borderRadius:3},
+          {label:'Ánimo',data:rows.map(r=>r.ani),backgroundColor:'rgba(200,240,80,.7)',borderRadius:3},
+          {label:'Sueño',data:rows.map(r=>r.sue),backgroundColor:'rgba(80,240,144,.7)',borderRadius:3},
+        ]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{labels:{color:'#9ca3af',font:{size:10,family:'DM Mono'},boxWidth:10}}},
+        scales:{
+          x:{ticks:{color:'#6b7280',font:{size:8},maxRotation:45},grid:{color:'rgba(255,255,255,.04)'}},
+          y:{min:0,max:5,ticks:{color:'#6b7280',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}
+        }
+      }
+    });
+  }
+  // History rows
+  const fmt=d=>d?d.toLocaleDateString('es-ES',{weekday:'short',day:'2-digit',month:'2-digit'}):'';
+  document.getElementById('drawer-rows').innerHTML=[...rows].reverse().map(r=>`
+    <div style="border-bottom:1px solid var(--bd);padding:8px 0;font-family:var(--fm);font-size:11px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span style="color:var(--mu)">${fmt(r.d)}</span>
+        ${r.les?`<span style="color:#f08080;font-size:10px">⚠ ${r.les.slice(0,30)}</span>`:''}
+      </div>
+      <div style="display:flex;gap:12px">
+        <span>FAT <b style="color:#f0a050">${r.fat??'—'}</b></span>
+        <span>FIS <b style="color:#50c8f0">${r.fis??'—'}</b></span>
+        <span>ANI <b style="color:#c8f050">${r.ani??'—'}</b></span>
+        <span>SUE <b style="color:#50f090">${r.sue??'—'}</b></span>
+        ${r.ciclo?`<span style="color:#d060f0">🌙 ${r.ciclo.slice(0,20)}</span>`:''}
+      </div>
+    </div>`).join('')||'<div style="color:var(--mu);font-size:12px;padding:16px 0">Sin respuestas en el período</div>';
+  // Open
+  document.getElementById('athl-drawer').style.right='0';
+  document.getElementById('athl-overlay').style.display='block';
+}
+function closeAthlDrawer(){
+  document.getElementById('athl-drawer').style.right='-420px';
+  document.getElementById('athl-overlay').style.display='none';
+}
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{});});
 }
 </script>
+
+<!-- Athlete History Drawer -->
+<div id="athl-drawer" style="position:fixed;top:0;right:-420px;width:420px;height:100vh;background:var(--bg2);border-left:1px solid var(--bd);z-index:1000;transition:right .3s ease;overflow-y:auto;padding:0">
+  <div style="position:sticky;top:0;background:var(--bg2);border-bottom:1px solid var(--bd);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;z-index:10">
+    <div>
+      <div id="drawer-name" style="font-family:var(--fh);font-size:18px;font-weight:700"></div>
+      <div id="drawer-sub" style="font-family:var(--fm);font-size:11px;color:var(--mu);margin-top:2px"></div>
+    </div>
+    <button onclick="closeAthlDrawer()" style="background:none;border:1px solid var(--bd);color:var(--mu);width:32px;height:32px;border-radius:6px;cursor:pointer;font-size:16px">×</button>
+  </div>
+  <div style="padding:16px 20px">
+    <div id="drawer-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px"></div>
+    <div style="font-family:var(--fm);font-size:10px;color:var(--mu);letter-spacing:.08em;margin-bottom:8px">EVOLUCIÓN</div>
+    <div style="position:relative;height:180px;margin-bottom:20px"><canvas id="drawer-chart"></canvas></div>
+    <div style="font-family:var(--fm);font-size:10px;color:var(--mu);letter-spacing:.08em;margin-bottom:8px">HISTORIAL DE RESPUESTAS</div>
+    <div id="drawer-rows"></div>
+  </div>
+</div>
+<div id="athl-overlay" onclick="closeAthlDrawer()" style="position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:999;display:none"></div>
 </body>
 </html>
