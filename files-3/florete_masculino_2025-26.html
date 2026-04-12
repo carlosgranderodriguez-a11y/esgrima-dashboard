@@ -1323,20 +1323,23 @@ function T(id){
 // ═══════════════════════════════════════
 async function forceSave(){
   const btn=event.target;
-  btn.textContent='☁ Guardando...';
   btn.disabled=true;
+  const total=Math.ceil(S.weeks.length/15)+Math.ceil(S.comps.length/10);
+  let done=0;
+  const upd=()=>{btn.textContent='☁ Guardando '+Math.round(done/total*100)+'%';};
+  upd();
   try{
-    // Save weeks in batches of 15
     for(let i=0;i<S.weeks.length;i+=15){
       const batch=S.weeks.slice(i,i+15);
       const wd=encodeURIComponent(JSON.stringify({weeks:batch,offset:i,total:S.weeks.length,nid:S.nid}));
       await jsonp(SCRIPT_URL+'?action=saveChunk&team='+STORE_KEY+'&chunk=weeks&data='+wd);
+      done++;upd();
     }
-    // Save comps in batches of 10
     for(let i=0;i<S.comps.length;i+=10){
       const batch=S.comps.slice(i,i+10);
       const cd=encodeURIComponent(JSON.stringify({comps:batch,offset:i,total:S.comps.length}));
       await jsonp(SCRIPT_URL+'?action=saveChunk&team='+STORE_KEY+'&chunk=comps&data='+cd);
+      done++;upd();
     }
     toast('✓ Datos guardados en Google Sheet');
     const ss=document.getElementById('sync-status');
