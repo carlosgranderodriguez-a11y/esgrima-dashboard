@@ -1254,11 +1254,50 @@ function openDayPanel(el){
   let sub=`Semana ${weekNum}`;
   if(allDayComps.length) sub+=` · ${allDayComps.map(c=>(c.tipo==='Concentración'?'◉ ':' ◆ ')+c.name).join('  ')}`;
   document.getElementById('dp-sub').textContent=sub;
+  // Competition section
+  const dpComps=document.getElementById('dp-comps');
+  if(dpComps){
+    if(allDayComps.length){
+      dpComps.innerHTML=allDayComps.map(c=>`
+        <div style="background:var(--bg3);border-radius:6px;padding:8px 10px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <span class="b ${TB(c.tipo)}" style="font-size:9px;margin-right:6px">${c.tipo}</span>
+            <span style="font-size:12px;font-weight:600">${c.name}</span>
+            ${c.lugar?`<span style="font-family:var(--fm);font-size:10px;color:var(--mu);margin-left:6px">📍 ${c.lugar}</span>`:''}
+          </div>
+          <button onclick="openCFfromDay(${c.id})" style="font-size:10px;font-family:var(--fm);padding:3px 8px;border-radius:4px;background:none;border:1px solid var(--bd);color:var(--bl);cursor:pointer">✎ Editar</button>
+        </div>`).join('');
+    } else {
+      dpComps.innerHTML=`<button onclick="addCompFromDay('${mes}',${weekNum})" style="width:100%;font-family:var(--fm);font-size:11px;padding:7px;border-radius:6px;background:rgba(200,240,80,.05);border:1px dashed rgba(200,240,80,.3);color:var(--mu);cursor:pointer;margin-bottom:10px">+ Añadir competición en esta semana</button>`;
+    }
+  }
   document.getElementById('dp-fase').value=d.fase||wd.fase||'';
   document.getElementById('dp-rpe').value=d.rpe||wd.rpe||'';
   document.getElementById('dp-nota').value=d.nota||'';
   const ov=document.getElementById('day-overlay');
   ov.style.display='flex';
+}
+
+function openCFfromDay(compId){
+  closeDayPanel();
+  T('adm');
+  // Small delay to let panel open then trigger edit
+  setTimeout(()=>openCF(compId),200);
+}
+
+function addCompFromDay(mes,sem){
+  closeDayPanel();
+  T('adm');
+  setTimeout(()=>{
+    // Open new comp form pre-filled with mes and sem
+    const cf=document.getElementById('comp-form');
+    if(cf)cf.style.display='block';
+    const cfMes=document.getElementById('cf-mes');
+    const cfSem=document.getElementById('cf-sem');
+    if(cfMes)cfMes.value=mes;
+    if(cfSem)cfSem.value=sem;
+    document.getElementById('cf-name')?.focus();
+  },200);
 }
 
 function closeDayPanel(){
