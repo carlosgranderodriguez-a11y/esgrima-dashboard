@@ -1326,26 +1326,23 @@ async function forceSave(){
   btn.textContent='☁ Guardando...';
   btn.disabled=true;
   try{
-    const slim={comps:S.comps,weeks:S.weeks,nid:S.nid};
-    const data=encodeURIComponent(JSON.stringify(slim));
-    let j;
-    if(data.length>6000){
-      const d1=encodeURIComponent(JSON.stringify({comps:S.comps,nid:S.nid,weeks:[]}));
-      const d2=encodeURIComponent(JSON.stringify({comps:[],nid:S.nid,weeks:S.weeks}));
-      await jsonp(SCRIPT_URL+'?action=savecomps&team='+STORE_KEY+'&data='+d1);
-      j=await jsonp(SCRIPT_URL+'?action=saveweeks&team='+STORE_KEY+'&data='+d2);
-    } else {
-      j=await jsonp(SCRIPT_URL+'?action=save&team='+STORE_KEY+'&data='+data);
+    // Save weeks in batches of 15
+    for(let i=0;i<S.weeks.length;i+=15){
+      const batch=S.weeks.slice(i,i+15);
+      const wd=encodeURIComponent(JSON.stringify({weeks:batch,offset:i,total:S.weeks.length,nid:S.nid}));
+      await jsonp(SCRIPT_URL+'?action=saveChunk&team='+STORE_KEY+'&chunk=weeks&data='+wd);
     }
-    if(j.ok){
-      toast('✓ Datos guardados en Google Sheet');
-      const ss=document.getElementById('sync-status');
-      if(ss){ss.textContent='✓ Guardado en Sheet';ss.style.color='var(--ok)';}
-    } else {
-      toast('⚠ Error al guardar: '+(j.error||'desconocido'));
+    // Save comps in batches of 10
+    for(let i=0;i<S.comps.length;i+=10){
+      const batch=S.comps.slice(i,i+10);
+      const cd=encodeURIComponent(JSON.stringify({comps:batch,offset:i,total:S.comps.length}));
+      await jsonp(SCRIPT_URL+'?action=saveChunk&team='+STORE_KEY+'&chunk=comps&data='+cd);
     }
+    toast('✓ Datos guardados en Google Sheet');
+    const ss=document.getElementById('sync-status');
+    if(ss){ss.textContent='✓ Guardado en Sheet';ss.style.color='var(--ok)';}
   }catch(e){
-    toast('⚠ Sin conexión al Sheet');
+    toast('⚠ Sin conexión al Sheet: '+e.message);
   }finally{
     btn.textContent='☁ Guardar todo en Sheet';
     btn.disabled=false;
