@@ -563,33 +563,17 @@ function saveS(){
 }
 async function saveToSheet(){
   try{
-    // Save weeks (one call)
     const wd=encodeURIComponent(JSON.stringify({weeks:S.weeks,nid:S.nid}));
     await jsonp(SCRIPT_URL+'?action=saveChunk&team='+STORE_KEY+'&chunk=weeks&data='+wd);
-    // Save comps in batches of 10
-    const batchSize=10;
-    for(let i=0;i<S.comps.length;i+=batchSize){
-      const batch=S.comps.slice(i,i+batchSize);
+    for(let i=0;i<S.comps.length;i+=10){
+      const batch=S.comps.slice(i,i+10);
       const cd=encodeURIComponent(JSON.stringify({comps:batch,offset:i,total:S.comps.length}));
       await jsonp(SCRIPT_URL+'?action=saveChunk&team='+STORE_KEY+'&chunk=comps&data='+cd);
     }
   }catch(e){
-    console.log('No se pudo guardar en Sheet:',e.message);
+    console.log('saveToSheet error:',e.message);
   }
 }
-function resetAll(){if(!confirm('¿Restaurar datos originales?'))return;localStorage.removeItem(STORE_KEY);location.reload();}
-loadS();
-
-// ═══════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════
-const R1=v=>Math.round(v*10)/10;
-const clr=(v,inv=false)=>inv?(v>3.5?'var(--dg)':v>2.5?'var(--wn)':'var(--ok)'):(v<3?'var(--dg)':v<4?'var(--wn)':'var(--ok)');
-const INI=n=>n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-const IB=i=>i==='alta'?'b-dg':i==='media'?'b-wn':'b-gr';
-const TB=t=>['Copa Mundo','Mundial','JJMM'].includes(t)?'b-dg':['Europeo','Campeonato'].includes(t)?'b-bl':t==='GP'?'b-ac':t==='Concentración'?'b-conc':'b-gr';
-const sortC=arr=>arr&&arr.length?[...arr].sort((a,b)=>MES_IDX.indexOf(a.mes)-MES_IDX.indexOf(b.mes)||(a.sem-b.sem)):[];
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.opacity='1';setTimeout(()=>t.style.opacity='0',2400);}
 const avg=arr=>arr.length?Math.round(arr.reduce((s,v)=>s+v,0)/arr.length*10)/10:0;
 
 function parseDate(str){
@@ -1300,8 +1284,10 @@ function T(id){
   if(id==='atl-ind'){
     document.querySelectorAll('.pnl').forEach(p=>p.style.display='none');
     document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('on'));
-    document.getElementById('pnl-atl-ind').style.display='block';
-    document.getElementById('tab-atl-ind').classList.add('on');
+    const pnlAI=document.getElementById('pnl-atl-ind');
+    if(pnlAI)pnlAI.style.display='block';
+    const tabAI=document.getElementById('tab-atl-ind');
+    if(tabAI){tabAI.style.display='flex';tabAI.classList.add('on');}
     return;
   }
   document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('on'));
@@ -1326,26 +1312,21 @@ async function forceSave(){
   btn.textContent='☁ Guardando...';
   btn.disabled=true;
   try{
-    const slim={comps:S.comps,weeks:S.weeks,nid:S.nid};
-    const data=encodeURIComponent(JSON.stringify(slim));
-    let j;
-    if(data.length>6000){
-      const d1=encodeURIComponent(JSON.stringify({comps:S.comps,nid:S.nid,weeks:[]}));
-      const d2=encodeURIComponent(JSON.stringify({comps:[],nid:S.nid,weeks:S.weeks}));
-      await jsonp(SCRIPT_URL+'?action=savecomps&team='+STORE_KEY+'&data='+d1);
-      j=await jsonp(SCRIPT_URL+'?action=saveweeks&team='+STORE_KEY+'&data='+d2);
-    } else {
-      j=await jsonp(SCRIPT_URL+'?action=save&team='+STORE_KEY+'&data='+data);
+    // Save weeks chunk
+    const wd=encodeURIComponent(JSON.stringify({weeks:S.weeks,nid:S.nid}));
+    const j1=await jsonp(SCRIPT_URL+'?action=saveChunk&team='+STORE_KEY+'&chunk=weeks&data='+wd);
+    // Save comps in batches of 10
+    for(let i=0;i<S.comps.length;i+=10){
+      const batch=S.comps.slice(i,i+10);
+      const cd=encodeURIComponent(JSON.stringify({comps:batch,offset:i,total:S.comps.length}));
+      await jsonp(SCRIPT_URL+'?action=saveChunk&team='+STORE_KEY+'&chunk=comps&data='+cd);
     }
-    if(j.ok){
-      toast('✓ Datos guardados en Google Sheet');
-      const ss=document.getElementById('sync-status');
-      if(ss){ss.textContent='✓ Guardado en Sheet';ss.style.color='var(--ok)';}
-    } else {
-      toast('⚠ Error al guardar: '+(j.error||'desconocido'));
-    }
+    toast('✓ Datos guardados en Google Sheet');
+    const ss=document.getElementById('sync-status');
+    if(ss){ss.textContent='✓ Guardado en Sheet';ss.style.color='var(--ok)';}
   }catch(e){
-    toast('⚠ Sin conexión al Sheet');
+    toast('⚠ Sin conexión al Sheet: '+e.message);
+    console.error('forceSave error:',e);
   }finally{
     btn.textContent='☁ Guardar todo en Sheet';
     btn.disabled=false;
