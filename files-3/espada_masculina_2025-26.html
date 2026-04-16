@@ -63,7 +63,7 @@ tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.02)
 .cdh{font-family:var(--fm);font-size:10px;color:var(--mu);text-align:center;padding:3px 0;letter-spacing:.06em}
 .wr{display:grid;grid-template-columns:50px repeat(7,minmax(0,1fr));gap:3px;margin-bottom:3px}
 .wl{font-family:var(--fm);font-size:9px;color:var(--mu);display:flex;align-items:center;justify-content:center}
-.cd{border-radius:4px;padding:8px 6px;min-height:90px;border:1px solid transparent;transition:opacity .15s}.cd:hover{opacity:.85}
+.cd{border-radius:4px;padding:8px 6px;min-height:115px;border:1px solid transparent;transition:opacity .15s}.cd:hover{opacity:.85}
 .cd.emp{background:rgba(255,255,255,.02)}
 .cd.phA{background:rgba(80,240,144,.07);border-color:rgba(80,240,144,.14)}
 .cd.phAp{background:rgba(80,240,144,.11);border-color:rgba(80,240,144,.22)}
@@ -292,8 +292,11 @@ tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.02)
           <option value="C">C — Competición</option><option value="RC">RC — Realiz. + Comp.</option>
         </select>
       </div>
-      <div class="fg"><label>RPE PLANIFICADO</label>
+      <div class="fg"><label style="color:#50c8f0">RPE FÍSICO</label>
         <input id="dp-rpe" type="number" step="0.1" min="1" max="10" placeholder="ej. 3.5">
+      </div>
+      <div class="fg"><label style="color:#50f090">RPE ESGRIMA</label>
+        <input id="dp-rpe-esg" type="number" step="0.1" min="1" max="10" placeholder="ej. 3.5">
       </div>
     </div>
     <div class="fg" style="margin-bottom:14px"><label>NOTA DEL DÍA</label>
@@ -376,6 +379,84 @@ tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.02)
   <div class="card">
     <div class="ct">Historial completo</div>
     <div id="ai-table"></div>
+  </div>
+</div>
+
+
+<!-- TESTS PANEL -->
+<div id="pnl-tst" class="pnl">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+    <div>
+      <div class="st">Tests Físicos</div>
+      <div class="ss">Evaluaciones periódicas del equipo</div>
+    </div>
+    <button onclick="openTestForm()" style="font-family:var(--fm);font-size:11px;padding:7px 14px;border-radius:6px;background:rgba(200,240,80,.1);border:1px solid rgba(200,240,80,.4);color:var(--ac);cursor:pointer">+ Añadir test</button>
+  </div>
+
+  <!-- Filters -->
+  <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+    <span style="font-family:var(--fm);font-size:10px;color:var(--mu)">ATLETA:</span>
+    <select id="tst-filter-atl" onchange="renderTests()" style="font-family:var(--fm);font-size:11px;padding:4px 8px;border-radius:4px;background:var(--bg3);border:1px solid var(--bd);color:var(--tx)">
+      <option value="">Todos</option>
+    </select>
+    <span style="font-family:var(--fm);font-size:10px;color:var(--mu);margin-left:8px">MÉTRICA:</span>
+    <select id="tst-filter-met" onchange="renderTests()" style="font-family:var(--fm);font-size:11px;padding:4px 8px;border-radius:4px;background:var(--bg3);border:1px solid var(--bd);color:var(--tx)">
+      <option value="CMJ_salto">CMJ Salto</option>
+      <option value="CMJ_fuerza">CMJ Fuerza</option>
+      <option value="ISO_SQ">ISO SQ</option>
+      <option value="DSI">DSI</option>
+      <option value="SQJ">SQJ</option>
+      <option value="HOP_RSI">HOP RSI</option>
+      <option value="SL_asim">Asimetría</option>
+      <option value="Reactividad">Reactividad</option>
+    </select>
+  </div>
+
+  <!-- Chart -->
+  <div class="card mb">
+    <div class="ct" id="tst-chart-title">Evolución</div>
+    <div style="position:relative;height:200px"><canvas id="tst-chart"></canvas></div>
+  </div>
+
+  <!-- Table -->
+  <div class="card">
+    <div class="ct">Registros</div>
+    <div id="tst-table" style="overflow-x:auto"></div>
+  </div>
+
+  <!-- Form overlay -->
+  <div id="tst-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:400;align-items:center;justify-content:center" onclick="if(event.target===this)closeTestForm()">
+    <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:24px;width:100%;max-width:600px;margin:16px;max-height:90vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div style="font-family:var(--fh);font-size:18px;font-weight:700">Nuevo Test</div>
+        <button onclick="closeTestForm()" style="background:none;border:1px solid var(--bd);color:var(--mu);width:30px;height:30px;border-radius:6px;cursor:pointer">×</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div class="fg"><label>FECHA *</label><input id="tf-fecha" type="date"></div>
+        <div class="fg"><label>ATLETA *</label>
+          <select id="tf-atleta" style="font-family:var(--fm);font-size:12px;padding:6px;border-radius:4px;background:var(--bg3);border:1px solid var(--bd);color:var(--tx);width:100%">
+            <option value="">— seleccionar —</option>
+          </select>
+        </div>
+        <div class="fg"><label style="color:#c8f050">CMJ Salto (cm)</label><input id="tf-CMJ_salto" type="number" step="0.1" placeholder="ej. 40.1"></div>
+        <div class="fg"><label style="color:#50c8f0">CMJ Fuerza (N/kg)</label><input id="tf-CMJ_fuerza" type="number" step="0.1" placeholder="ej. 26.3"></div>
+        <div class="fg"><label style="color:#f0a050">ISO SQ (N/kg)</label><input id="tf-ISO_SQ" type="number" step="0.01" placeholder="ej. 46.02"></div>
+        <div class="fg"><label style="color:#d060f0">DSI</label><input id="tf-DSI" type="number" step="0.01" placeholder="auto si CMJ/ISO"></div>
+        <div class="fg"><label style="color:#50f090">SQJ (cm)</label><input id="tf-SQJ" type="number" step="0.1" placeholder="ej. 33.4"></div>
+        <div class="fg"><label style="color:#f08080">HOP RSI</label><input id="tf-HOP_RSI" type="number" step="0.01" placeholder="ej. 1.51"></div>
+        <div class="fg"><label style="color:#f0c050">HOP Distancia (cm)</label><input id="tf-HOP_CM" type="number" step="0.1" placeholder="ej. 33.1"></div>
+        <div class="fg"><label style="color:#80c8f0">Single Leg Izq</label><input id="tf-SL_izq" type="number" step="0.1" placeholder="ej. 19"></div>
+        <div class="fg"><label style="color:#80f0c8">Single Leg Der</label><input id="tf-SL_der" type="number" step="0.1" placeholder="ej. 15.2"></div>
+        <div class="fg"><label style="color:#c8f050">Reactividad Esgrima (s)</label><input id="tf-Reactividad" type="number" step="0.01" placeholder="ej. 6.16"></div>
+      </div>
+      <div class="fg" style="margin-bottom:14px"><label>CONCLUSIONES</label>
+        <textarea id="tf-Conclusiones" rows="3" placeholder="Observaciones del test..." style="width:100%;font-family:var(--fm);font-size:12px;padding:8px;border-radius:4px;background:var(--bg3);border:1px solid var(--bd);color:var(--tx);resize:vertical"></textarea>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button onclick="closeTestForm()" style="font-family:var(--fm);font-size:11px;padding:7px 14px;border-radius:4px;background:var(--bg3);border:1px solid var(--bd);color:var(--mu);cursor:pointer">Cancelar</button>
+        <button onclick="saveTestData()" style="font-family:var(--fm);font-size:11px;padding:7px 14px;border-radius:4px;background:rgba(200,240,80,.1);border:1px solid rgba(200,240,80,.4);color:var(--ac);cursor:pointer">Guardar test</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1227,6 +1308,7 @@ function openDayPanel(el){
   }
   document.getElementById('dp-fase').value=d.fase||wd.fase||'';
   document.getElementById('dp-rpe').value=d.rpe||wd.rpe||'';
+  document.getElementById('dp-rpe-esg').value=d.rpe_esg||'';
   document.getElementById('dp-nota').value=d.nota||'';
   const ov=document.getElementById('day-overlay');
   ov.style.display='flex';
@@ -1265,7 +1347,8 @@ function saveDayData(){
   const rpe=parseFloat(document.getElementById('dp-rpe').value)||null;
   const nota=document.getElementById('dp-nota').value.trim();
   if(fase||rpe||nota){
-    S.days[currentDayKey]={fase,rpe,nota};
+    const rpe_esg=parseFloat(document.getElementById('dp-rpe-esg').value)||null;
+    S.days[currentDayKey]={fase,rpe,nota,rpe_esg};
     // Auto-save this day to Sheet
     const month=currentDayKey.split('-').slice(0,2).join('-');
     const entries=Object.entries(S.days).filter(([k])=>k.startsWith(month)).map(([k,v])=>({k,v}));
@@ -1313,6 +1396,7 @@ function T(id){
   if(id==='cal')bCal();
   if(id==='tmp'){bTL();bTCtbl();}
   if(id==='ale')bAle();
+  if(id==='tst'){if(!built['tst']){built['tst']=true;loadTests();populateTstFilters();}}
   if(id==='adm'){rAC();rAW();}
 }
 
@@ -1555,6 +1639,190 @@ function closeAthlDrawer(){
 </script>
 
 <script>
+
+// ── TESTS FÍSICOS ──────────────────────────────────────────
+let TESTS = [];
+let tstChart = null;
+const TST_FIELDS = [{"key": "CMJ_salto", "label": "CMJ Salto (cm)", "unit": "cm", "color": "#c8f050"}, {"key": "CMJ_fuerza", "label": "CMJ Fuerza (N/kg)", "unit": "N/kg", "color": "#50c8f0"}, {"key": "ISO_SQ", "label": "ISO SQ (N/kg)", "unit": "N/kg", "color": "#f0a050"}, {"key": "DSI", "label": "DSI", "unit": "", "color": "#d060f0"}, {"key": "SQJ", "label": "SQJ (cm)", "unit": "cm", "color": "#50f090"}, {"key": "HOP_RSI", "label": "HOP RSI", "unit": "", "color": "#f08080"}, {"key": "HOP_CM", "label": "HOP Distancia (cm)", "unit": "cm", "color": "#f0c050"}, {"key": "SL_izq", "label": "Single Leg Izq", "unit": "cm", "color": "#80c8f0"}, {"key": "SL_der", "label": "Single Leg Der", "unit": "cm", "color": "#80f0c8"}, {"key": "SL_asim", "label": "Asimetría (%)", "unit": "%", "color": "#f06060"}, {"key": "Reactividad", "label": "Reactividad Esgr.", "unit": "s", "color": "#c8f050"}];
+const TST_ATHLETES = {"esgrima26masc": ["Gerard Gonell", "Diego Rodriguez", "Rayan Rami", "Ricardo Sanchez", "Juan Pedro Romero", "Eugeni Gavalda", "Lucas Ramirez", "Pablo Ruiz", "Alvaro Fernandez Calleja"], "esgrima26fem": ["Dana Raposo", "Inés Garcia", "Daniela Pinyol", "Lucia Abajo", "Lola Estevez", "Maria Mateos"], "florete26masc": [], "florete26fem": [], "sable26masc": []};
+
+async function loadTests(){
+  try{
+    const j=await jsonp(SCRIPT_URL+'?action=loadTests&team='+STORE_KEY);
+    if(j.tests){
+      TESTS=j.tests;
+      renderTests();
+    }
+  }catch(e){
+    console.log('Error cargando tests:',e.message);
+  }
+}
+
+function renderTests(){
+  const atlFilter=document.getElementById('tst-filter-atl')?.value||'';
+  const metKey=document.getElementById('tst-filter-met')?.value||'CMJ_salto';
+  const metInfo=TST_FIELDS.find(f=>f.key===metKey)||TST_FIELDS[0];
+
+  // Filter
+  const filtered=atlFilter?TESTS.filter(t=>t.Atleta===atlFilter):TESTS;
+
+  // Chart title
+  const title=document.getElementById('tst-chart-title');
+  if(title)title.textContent=(atlFilter||'Equipo')+' — '+metInfo.label;
+
+  // Chart
+  if(tstChart){tstChart.destroy();tstChart=null;}
+  const ctx=document.getElementById('tst-chart');
+  if(ctx&&filtered.length>0){
+    // Group by athlete if showing all
+    if(!atlFilter){
+      const athletes=[...new Set(filtered.map(t=>t.Atleta))];
+      const colors=['#c8f050','#50c8f0','#f0a050','#d060f0','#50f090','#f08080','#80c8f0'];
+      const datasets=athletes.map((atl,i)=>{
+        const atlTests=filtered.filter(t=>t.Atleta===atl).sort((a,b)=>new Date(a.Fecha)-new Date(b.Fecha));
+        return{
+          label:atl,
+          data:atlTests.map(t=>({x:t.Fecha,y:parseFloat(t[metKey])||null})),
+          borderColor:colors[i%colors.length],
+          backgroundColor:colors[i%colors.length]+'22',
+          tension:.3,pointRadius:4,fill:false
+        };
+      });
+      tstChart=new Chart(ctx,{type:'line',data:{datasets},options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{labels:{color:'#9ca3af',font:{size:10,family:'DM Mono'},boxWidth:10}}},
+        scales:{x:{type:'category',ticks:{color:'#6b7280',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}},
+        y:{ticks:{color:'#6b7280',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'},title:{display:true,text:metInfo.unit,color:'#6b7280',font:{size:9}}}}}});
+    } else {
+      const sorted=[...filtered].sort((a,b)=>new Date(a.Fecha)-new Date(b.Fecha));
+      tstChart=new Chart(ctx,{type:'line',data:{
+        labels:sorted.map(t=>t.Fecha),
+        datasets:[{label:metInfo.label,data:sorted.map(t=>parseFloat(t[metKey])||null),
+          borderColor:metInfo.color,backgroundColor:metInfo.color+'22',
+          tension:.3,pointRadius:5,fill:true}]},
+        options:{responsive:true,maintainAspectRatio:false,
+          plugins:{legend:{display:false}},
+          scales:{x:{ticks:{color:'#6b7280',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}},
+          y:{ticks:{color:'#6b7280',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'},
+          title:{display:true,text:metInfo.unit,color:'#6b7280',font:{size:9}}}}}});
+    }
+  }
+
+  // Table
+  const tbl=document.getElementById('tst-table');
+  if(!tbl)return;
+  if(filtered.length===0){tbl.innerHTML='<div style="color:var(--mu);padding:16px;font-size:12px">No hay tests registrados</div>';return;}
+  const sorted=[...filtered].sort((a,b)=>new Date(b.Fecha)-new Date(a.Fecha));
+  tbl.innerHTML=`<table style="width:100%;border-collapse:collapse;font-family:var(--fm);font-size:11px;min-width:700px">
+    <thead><tr style="border-bottom:2px solid var(--bd)">
+      <th style="text-align:left;padding:6px 8px;color:var(--mu);font-size:10px">FECHA</th>
+      <th style="text-align:left;padding:6px 8px;color:var(--mu);font-size:10px">ATLETA</th>
+      <th style="padding:6px 4px;color:#c8f050;font-size:10px">CMJ</th>
+      <th style="padding:6px 4px;color:#f0a050;font-size:10px">ISO SQ</th>
+      <th style="padding:6px 4px;color:#d060f0;font-size:10px">DSI</th>
+      <th style="padding:6px 4px;color:#50f090;font-size:10px">SQJ</th>
+      <th style="padding:6px 4px;color:#f08080;font-size:10px">HOP RSI</th>
+      <th style="padding:6px 4px;color:#80c8f0;font-size:10px">SL Asim</th>
+      <th style="padding:6px 4px;color:#c8f050;font-size:10px">React.</th>
+      <th style="padding:6px 8px;color:var(--mu);font-size:10px"></th>
+    </tr></thead>
+    <tbody>${sorted.map(t=>`
+      <tr style="border-bottom:1px solid var(--bd)">
+        <td style="padding:7px 8px;color:var(--mu)">${t.Fecha||''}</td>
+        <td style="padding:7px 8px;font-weight:500">${t.Atleta||''}</td>
+        <td style="padding:7px 4px;text-align:center;color:#c8f050">${t.CMJ_salto||'—'}</td>
+        <td style="padding:7px 4px;text-align:center;color:#f0a050">${t.ISO_SQ||'—'}</td>
+        <td style="padding:7px 4px;text-align:center;color:#d060f0">${t.DSI||'—'}</td>
+        <td style="padding:7px 4px;text-align:center;color:#50f090">${t.SQJ||'—'}</td>
+        <td style="padding:7px 4px;text-align:center;color:#f08080">${t.HOP_RSI||'—'}</td>
+        <td style="padding:7px 4px;text-align:center;color:${parseFloat(t.SL_asim)>0.15?'#f08080':'#50f090'}">${t.SL_asim?Math.round(parseFloat(t.SL_asim)*100)+'%':'—'}</td>
+        <td style="padding:7px 4px;text-align:center;color:#c8f050">${t.Reactividad||'—'}</td>
+        <td style="padding:7px 8px"><button onclick="deleteTestRow('${t.Fecha}','${t.Atleta}')" style="background:none;border:none;color:var(--dg);cursor:pointer;font-size:12px">✕</button></td>
+      </tr>
+      ${t.Conclusiones?`<tr><td colspan="10" style="padding:4px 8px 8px;font-size:10px;color:var(--mu);font-style:italic">${t.Conclusiones}</td></tr>`:''}`).join('')}
+    </tbody></table>`;
+}
+
+function openTestForm(){
+  // Set today's date
+  document.getElementById('tf-fecha').value=new Date().toISOString().slice(0,10);
+  // Populate athletes
+  const atlSel=document.getElementById('tf-atleta');
+  const athletes=TST_ATHLETES[STORE_KEY]||[];
+  atlSel.innerHTML='<option value="">— seleccionar —</option>'+
+    athletes.map(a=>`<option value="${a}">${a}</option>`).join('');
+  // Clear fields
+  ['CMJ_salto','CMJ_fuerza','ISO_SQ','DSI','SQJ','HOP_RSI','HOP_CM','SL_izq','SL_der','Reactividad'].forEach(f=>{
+    const el=document.getElementById('tf-'+f);
+    if(el)el.value='';
+  });
+  document.getElementById('tf-Conclusiones').value='';
+  document.getElementById('tst-overlay').style.display='flex';
+}
+
+function closeTestForm(){
+  document.getElementById('tst-overlay').style.display='none';
+}
+
+async function saveTestData(){
+  const fecha=document.getElementById('tf-fecha').value;
+  const atleta=document.getElementById('tf-atleta').value;
+  if(!fecha||!atleta){toast('⚠ Fecha y atleta son obligatorios');return;}
+  
+  const cmjF=parseFloat(document.getElementById('tf-CMJ_fuerza').value)||null;
+  const isoSQ=parseFloat(document.getElementById('tf-ISO_SQ').value)||null;
+  const dsi=cmjF&&isoSQ?Math.round(cmjF/isoSQ*100)/100:parseFloat(document.getElementById('tf-DSI').value)||null;
+  const slIzq=parseFloat(document.getElementById('tf-SL_izq').value)||null;
+  const slDer=parseFloat(document.getElementById('tf-SL_der').value)||null;
+  const slAsim=slIzq&&slDer?Math.round(Math.abs(slIzq-slDer)/Math.max(slIzq,slDer)*1000)/1000:null;
+
+  const test={
+    Fecha:fecha, Atleta:atleta,
+    CMJ_salto:parseFloat(document.getElementById('tf-CMJ_salto').value)||'',
+    CMJ_fuerza:cmjF||'', ISO_SQ:isoSQ||'', DSI:dsi||'',
+    SQJ:parseFloat(document.getElementById('tf-SQJ').value)||'',
+    HOP_RSI:parseFloat(document.getElementById('tf-HOP_RSI').value)||'',
+    HOP_CM:parseFloat(document.getElementById('tf-HOP_CM').value)||'',
+    SL_izq:slIzq||'', SL_der:slDer||'', SL_asim:slAsim||'',
+    Reactividad:parseFloat(document.getElementById('tf-Reactividad').value)||'',
+    Conclusiones:document.getElementById('tf-Conclusiones').value.trim()
+  };
+
+  try{
+    const data=encodeURIComponent(JSON.stringify(test));
+    const r=await jsonp(SCRIPT_URL+'?action=saveTest&team='+STORE_KEY+'&data='+data);
+    if(r.ok){
+      TESTS.push(test);
+      renderTests();
+      closeTestForm();
+      toast('✓ Test guardado');
+    } else {
+      toast('⚠ Error: '+(r.error||'desconocido'));
+    }
+  }catch(e){
+    toast('⚠ Sin conexión al Sheet');
+  }
+}
+
+async function deleteTestRow(fecha,atleta){
+  if(!confirm('¿Eliminar este test?'))return;
+  try{
+    const r=await jsonp(SCRIPT_URL+'?action=deleteTest&team='+STORE_KEY+'&fecha='+encodeURIComponent(fecha)+'&atleta='+encodeURIComponent(atleta));
+    if(r.ok){
+      TESTS=TESTS.filter(t=>!(t.Fecha===fecha&&t.Atleta===atleta));
+      renderTests();
+      toast('✓ Test eliminado');
+    }
+  }catch(e){
+    toast('⚠ Sin conexión al Sheet');
+  }
+}
+
+function populateTstFilters(){
+  const atls=TST_ATHLETES[STORE_KEY]||[];
+  const sel=document.getElementById('tst-filter-atl');
+  if(sel){sel.innerHTML='<option value="">Todos</option>'+atls.map(a=>`<option value="${a}">${a}</option>`).join('');}
+}
+
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{});});
 }
